@@ -1,0 +1,27 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    env_file:
+      - ../.env.example
+    environment:
+      ENVIRONMENT: development
+      PYTHONPATH: /app/backend
+      DATABASE_URL: sqlite:////app/outputs/local_data/afrivoice.db
+      STORAGE_BACKEND: local
+      QUEUE_BACKEND: local
+      ASR_ADAPTER: mock
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../outputs/local_data:/app/outputs/local_data
+      - ../data:/app/data
+      - ../models:/app/models
+      - ../reports:/app/reports
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"

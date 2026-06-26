@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AfriVoice EAC ASR Console</title>
+    <link rel="stylesheet" href="/static/styles.css?v=20260622-more-clean" />
+  </head>
+  <body>
+    <svg aria-hidden="true" class="icon-sprite">
+      <symbol id="icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" />
+      </symbol>
+      <symbol id="icon-home" viewBox="0 0 24 24">
+        <path d="m3 11 9-8 9 8" />
+        <path d="M5 10v10h14V10" />
+        <path d="M10 20v-6h4v6" />
+      </symbol>
+      <symbol id="icon-mic" viewBox="0 0 24 24">
+        <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" />
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+        <path d="M12 19v3" />
+      </symbol>
+      <symbol id="icon-history" viewBox="0 0 24 24">
+        <path d="M3 12a9 9 0 1 0 3-6.7" />
+        <path d="M3 4v6h6" />
+        <path d="M12 7v5l3 2" />
+      </symbol>
+      <symbol id="icon-model" viewBox="0 0 24 24">
+        <path d="M12 3 3 8l9 5 9-5-9-5Z" />
+        <path d="m3 16 9 5 9-5" />
+        <path d="m3 12 9 5 9-5" />
+      </symbol>
+      <symbol id="icon-benchmark" viewBox="0 0 24 24">
+        <path d="M4 20V10" />
+        <path d="M10 20V4" />
+        <path d="M16 20v-7" />
+        <path d="M22 20H2" />
+      </symbol>
+      <symbol id="icon-data" viewBox="0 0 24 24">
+        <path d="m8 8-4 4 4 4" />
+        <path d="m16 8 4 4-4 4" />
+        <path d="m14 4-4 16" />
+      </symbol>
+      <symbol id="icon-notebook" viewBox="0 0 24 24">
+        <path d="m8 8-4 4 4 4" />
+        <path d="m16 8 4 4-4 4" />
+      </symbol>
+      <symbol id="icon-dataset" viewBox="0 0 24 24">
+        <path d="M4 5h16v14H4Z" />
+        <path d="M4 10h16" />
+        <path d="M9 10v9" />
+        <path d="M15 10v9" />
+      </symbol>
+      <symbol id="icon-competition" viewBox="0 0 24 24">
+        <path d="M8 4h8v5a4 4 0 0 1-8 0V4Z" />
+        <path d="M8 6H4a4 4 0 0 0 4 4" />
+        <path d="M16 6h4a4 4 0 0 1-4 4" />
+        <path d="M12 13v5" />
+        <path d="M8 21h8" />
+      </symbol>
+      <symbol id="icon-hackathon" viewBox="0 0 24 24">
+        <path d="M9 18h6" />
+        <path d="M10 22h4" />
+        <path d="M8 14a6 6 0 1 1 8 0c-1 1-1 2-1 4H9c0-2 0-3-1-4Z" />
+      </symbol>
+      <symbol id="icon-discussion" viewBox="0 0 24 24">
+        <path d="M4 5h16v12H7l-3 3V5Z" />
+        <path d="M8 9h8" />
+        <path d="M8 13h5" />
+      </symbol>
+      <symbol id="icon-learn" viewBox="0 0 24 24">
+        <path d="m3 8 9-4 9 4-9 4-9-4Z" />
+        <path d="M7 10v5c3 2 7 2 10 0v-5" />
+      </symbol>
+      <symbol id="icon-more" viewBox="0 0 24 24">
+        <path d="M8 6h13" />
+        <path d="M8 12h13" />
+        <path d="M8 18h13" />
+        <path d="M3 6h.01" />
+        <path d="M3 12h.01" />
+        <path d="M3 18h.01" />
+      </symbol>
+      <symbol id="icon-analytics" viewBox="0 0 24 24">
+        <path d="M4 17 9 9l4 6 7-11" />
+        <path d="M4 21h16" />
+      </symbol>
+      <symbol id="icon-tools" viewBox="0 0 24 24">
+        <path d="M14.7 6.3a4 4 0 0 0-5 5L3 18v3h3l6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z" />
+      </symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m16 16 5 5" />
+      </symbol>
+    </svg>
+    <aside class="rail" aria-label="Primary navigation">
+      <label class="menu-button" title="Toggle navigation" aria-label="Toggle navigation">
+        <input id="navToggle" class="nav-toggle" type="checkbox" aria-label="Toggle navigation menu" />
+        <svg class="icon"><use href="#icon-menu"></use></svg>
+      </label>
+      <div class="brand-lockup">
+        <div class="brand-mark">AV</div>
+        <div>
+          <strong>Kaggle</strong>
+          <span>ASR Ops</span>
+        </div>
+      </div>
+      <div class="create-menu-wrap">
+        <button id="createMenuButton" class="create-button" type="button" aria-expanded="false"><svg class="icon"><use href="#icon-plus"></use></svg> Create</button>
+        <div id="createMenu" class="create-menu" hidden>
+          <button type="button" data-create-type="notebook"><svg class="icon"><use href="#icon-notebook"></use></svg> Notebook</button>
+          <button type="button" data-create-type="dataset"><svg class="icon"><use href="#icon-dataset"></use></svg> Dataset</button>
+          <button type="button" data-create-type="competition"><svg class="icon"><use href="#icon-competition"></use></svg> Competition</button>
+          <button type="button" data-create-type="hackathon"><svg class="icon"><use href="#icon-hackathon"></use></svg> Hackathon</button>
+          <button type="button" data-create-type="benchmark"><svg class="icon"><use href="#icon-benchmark"></use></svg> Benchmark</button>
+        </div>
+      </div>
+      <button class="rail-button active" data-jump="overview" title="Home"><svg class="icon"><use href="#icon-home"></use></svg> <span>Home</span></button>
+      <button class="rail-button" data-jump="codeapi" title="Notebook"><svg class="icon"><use href="#icon-notebook"></use></svg> <span>Notebook</span></button>
+      <button class="rail-button" data-jump="audit" title="Dataset"><svg class="icon"><use href="#icon-dataset"></use></svg> <span>Dataset</span></button>
+      <button class="rail-button" data-jump="competition" title="Competition"><svg class="icon"><use href="#icon-competition"></use></svg> <span>Competition</span></button>
+      <button class="rail-button" data-jump="hackathon" title="Hackathon"><svg class="icon"><use href="#icon-hackathon"></use></svg> <span>Hackathon</span></button>
+      <button class="rail-button" data-jump="leaderboard" title="Benchmarks"><svg class="icon"><use href="#icon-benchmark"></use></svg> <span>Benchmarks</span></button>
+      <button class="rail-button" data-jump="explorer" title="Data Hub"><svg class="icon"><use href="#icon-data"></use></svg> <span>Data Hub</span></button>
+      <div class="rail-subnav">
+        <button data-jump="audit" type="button">Datasets</button>
+        <button data-jump="models" type="button">Model Registry</button>
+        <button data-jump="codeapi" type="button">Code / API</button>
+      </div>
+      <button class="rail-button" data-jump="activity" title="Analytics"><svg class="icon"><use href="#icon-analytics"></use></svg> <span>Analytics</span></button>
+      <button class="rail-button" data-jump="tools" title="Tools"><svg class="icon"><use href="#icon-tools"></use></svg> <span>Tools</span></button>
+      <div class="rail-more">
+        <button id="moreToggleButton" class="rail-button more-anchor" type="button" aria-expanded="false" title="More"><svg class="icon"><use href="#icon-more"></use></svg> <span>More</span></button>
+        <button class="rail-button more-collapsible" data-jump="transcribe" title="ASR Workspace"><svg class="icon"><use href="#icon-mic"></use></svg> <span>ASR Workspace</span></button>
+        <button class="rail-button more-collapsible" data-jump="history" title="Transcript History"><svg class="icon"><use href="#icon-history"></use></svg> <span>History</span></button>
+        <button class="rail-button more-collapsible" data-jump="models" title="Models"><svg class="icon"><use href="#icon-model"></use></svg> <span>Models</span></button>
+        <button class="rail-button more-collapsible" data-jump="discussions" title="Discussions"><svg class="icon"><use href="#icon-discussion"></use></svg> <span>Discussions</span></button>
+        <button class="rail-button more-collapsible" data-jump="learn" title="Learn"><svg class="icon"><use href="#icon-learn"></use></svg> <span>Learn</span></button>
+        <button class="rail-button more-collapsible" data-jump="documentation" title="Documentation"><svg class="icon"><use href="#icon-notebook"></use></svg> <span>Documentation</span></button>
+        <button class="rail-button more-collapsible" data-jump="rankings" title="Kaggle Rankings"><svg class="icon"><use href="#icon-benchmark"></use></svg> <span>Kaggle Rankings</span></button>
+      </div>
+    </aside>
+
+    <main class="shell">
+      <header class="topbar">
+        <div class="search">
+          <svg class="icon search-icon" aria-hidden="true"><use href="#icon-search"></use></svg>
+          <input id="globalSearch" type="search" placeholder="Search Swahili, Maasai, WER, recorder, history" autocomplete="off" />
+          <div id="searchResults" class="search-results" hidden></div>
+        </div>
+        <nav class="top-actions" aria-label="Quick actions">
+          <div class="auth-actions">
+            <button id="signInButton" class="auth-link" type="button">Sign In</button>
+            <button id="registerButton" class="register-action" type="button">Register</button>
+            <div id="userMenu" class="user-menu" hidden>
+              <button id="userMenuButton" class="user-chip" type="button" aria-expanded="false">
+                <span id="userInitials">US</span>
+                <strong id="userName">User</strong>
+              </button>
+              <div id="userDropdown" class="user-dropdown" hidden>
+                <span id="userEmail">Signed in</span>
+                <button id="signOutButton" type="button">Sign out</button>
+              </div>
+            </div>
+          </div>
+          <div class="utility-actions">
+            <div class="local-status-wrap">
+              <button id="localStatusButton" class="status-action" type="button" aria-expanded="false">
+                <span class="status-light" aria-hidden="true"></span>
+                Local
+              </button>
+              <div id="localStatusMenu" class="local-status-menu" hidden>
+                <strong>Local workspace</strong>
+                <span>Frontend and API are running on this machine.</span>
+                <code>http://127.0.0.1:8000</code>
+                <div class="local-menu-actions">
+                  <button id="copyLocalUrlButton" type="button">Copy URL</button>
+                  <a href="/docs">Open API docs</a>
+                </div>
+              </div>
+            </div>
+            <button id="themeToggle" class="toolbar-icon-button" type="button" aria-label="Toggle theme">
+              <span class="theme-dot" aria-hidden="true"></span>
+              <span id="themeToggleText">Dark mode</span>
+            </button>
+            <a class="docs-action" href="/docs">API Docs</a>
+          </div>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Production backend · multilingual ASR · offline edge</p>
+          <h1>East African Speech Recognition Operations Console</h1>
+          <p class="summary">
+            Record, upload, transcribe, monitor, correct, and prepare ASR submissions for Swahili,
+            Kikuyu, Luo, Somali, Maasai, and Kalenjin from one backend workspace.
+          </p>
+          <div class="hero-actions">
+            <button class="primary" data-jump="transcribe">Record audio</button>
+          </div>
+        </div>
+        <div class="model-tile" aria-label="Active model">
+          <span class="tile-label">Active runtime</span>
+          <strong id="activeModel">Loading model...</strong>
+          <span id="modelRuntime">Checking backend</span>
+        </div>
+      </section>
+
+      <section class="tabs" aria-label="Workspace tabs">
+        <button class="tab active" data-panel="overview">Overview</button>
+        <button class="tab" data-panel="transcribe">Transcribe</button>
+        <button class="tab" data-panel="history">Speech Library</button>
+        <button class="tab" data-panel="editor">Editor</button>
+        <button class="tab" data-panel="batch">Batch</button>
+        <button class="tab" data-panel="models">Models</button>
+        <button class="tab" data-panel="leaderboard">Leaderboard</button>
+        <button class="tab" data-panel="audit">Audit</button>
+        <button class="tab" data-panel="explorer">Explorer</button>
+        <button class="tab" data-panel="activity">Activity</button>
+        <button class="tab" data-panel="tools">Tools</button>
+        <button class="tab" data-panel="integrations">Integrations</button>
+        <button class="tab" data-panel="codeapi">Code / API</button>
+        <button class="tab" data-panel="metadata">Metadata</button>
+        <button class="tab" data-panel="jobs">Jobs</button>
+        <button class="tab" data-panel="evaluation">Evaluation</button>
+        <button class="tab" data-panel="deployment">Deployment</button>
+        <button class="tab" data-panel="settings">Settings</button>
+        <button class="tab" data-panel="auditlog">Audit Logs</button>
+      </section>
+
+      <section class="layout">
+        <div class="content">
+          <section class="panel active" id="overview">
+            <div class="section-head">
+              <h2>Command Center</h2>
+              <span class="status-dot">Six-language ASR pipeline online</span>
+            </div>
+            <p class="lead">
+              This console is designed for backend operation: speech capture, file ingestion, language detection,
+              ASR inference, transcript storage, human correction, dataset audit, and edge export.
+            </p>
+
+            <div class="workflow-grid">
+              <article data-jump="transcribe"><strong>1</strong><span>Record speech</span><small>Capture or upload audio</small></article>
+              <article data-jump="history"><strong>2</strong><span>Review transcript</span><small>Open saved results</small></article>
+              <article data-jump="editor"><strong>3</strong><span>Correct transcript</span><small>Improve future training</small></article>
+              <article data-jump="metadata"><strong>4</strong><span>Export / submit</span><small>Download or build Kaggle job</small></article>
+            </div>
+
+            <div class="onboarding-card">
+              <div class="section-head compact-head">
+                <h2>First-use checklist</h2>
+                <span class="muted">A complete ASR workflow</span>
+              </div>
+              <div class="checklist">
+                <label><input type="checkbox" /> Upload or record audio</label>
+                <label><input type="checkbox" /> Choose language or auto-detect</label>
+                <label><input type="checkbox" /> Review transcript</label>
+                <label><input type="checkbox" /> Save correction</label>
+                <label><input type="checkbox" /> Export result</label>
+              </div>
+            </div>
+
+            <div class="language-grid">
+              <article data-language-card="swa"><strong>swa</strong><span>Swahili</span><small class="status-badge ready">Ready</small></article>
+              <article data-language-card="kik"><strong>kik</strong><span>Kikuyu</span><small class="status-badge training">Training</small></article>
+              <article data-language-card="luo"><strong>luo</strong><span>Luo / Dholuo</span><small class="status-badge ready">Ready</small></article>
+              <article data-language-card="som"><strong>som</strong><span>Somali</span><small class="status-badge ready">Ready</small></article>
+              <article data-language-card="mas"><strong>mas</strong><span>Maasai</span><small class="status-badge review">Needs review</small></article>
+              <article data-language-card="kln"><strong>kln</strong><span>Kalenjin</span><small class="status-badge training">Training</small></article>
+            </div>
+
+            <div class="activity-strip" id="activityStrip"></div>
+
+            <div class="detail-view">
+              <div class="detail-title">
+                <h2>Detail View</h2>
+                <button class="collapse-button" title="Collapse section">⌃</button>
+              </div>
+              <div class="detail-grid">
+                <article class="detail-card">
+                  <div class="detail-card-head">
+                    <h3>Views</h3>
+                    <select aria-label="Views time range">
+                      <option>Last month</option>
+                      <option>Last week</option>
+                      <option>All time</option>
+                    </select>
+                  </div>
+                  <div class="line-chart" id="viewsChart" aria-label="Views chart"></div>
+                </article>
+                <article class="detail-card">
+                  <div class="detail-card-head">
+                    <h3>Downloads</h3>
+                    <select aria-label="Downloads time range">
+                      <option>Last month</option>
+                      <option>Last week</option>
+                      <option>All time</option>
+                    </select>
+                  </div>
+                  <div class="dot-chart" id="downloadsChart" aria-label="Downloads chart"></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="accordion">
+              <details open>
+                <summary>Product integrations</summary>
+                <div class="feature-list">
+                  <span>Language ID</span>
+                  <span>Streaming ASR</span>
+                  <span>Speaker diarization</span>
+                  <span>Translation</span>
+                  <span>Confidence review</span>
+                  <span>Kaggle submission</span>
+                  <span>Transcript editor</span>
+                  <span>Batch transcription</span>
+                  <span>Model comparison</span>
+                  <span>Dataset audit</span>
+                  <span>WER calculator</span>
+                  <span>Custom vocabulary</span>
+                </div>
+              </details>
+              <details>
+                <summary>Implementation stack</summary>
+                <p>FastAPI, SQLite locally, Postgres-ready schema, mock ASR runtime now, Whisper/faster-whisper next.</p>
+              </details>
+              <details>
+                <summary>Deployment modes</summary>
+                <p>Server API, async worker, local CLI, quantized offline model package, and future mobile runtime.</p>
+              </details>
+            </div>
+          </section>
+
+          <section class="panel" id="transcribe">
+            <div class="section-head">
+              <h2>Automatic Speech Recognition</h2>
+              <span class="muted">Record live audio or upload a file</span>
+            </div>
+            <div class="recorder-console">
+              <div>
+                <h3>Live recorder</h3>
+                <p>Capture speech from your microphone and submit it directly to the ASR backend.</p>
+              </div>
+              <div class="record-controls">
+                <button id="recordButton" class="record-button" type="button">Start recording</button>
+                <button id="stopRecordButton" class="secondary-action" type="button" disabled>Stop</button>
+                <span id="recordStatus">Ready</span>
+                <strong id="recordTimer">00:00</strong>
+              </div>
+              <div class="recorder-status-grid">
+                <article>
+                  <span>Microphone</span>
+                  <strong id="micPermissionStatus">Checking permission...</strong>
+                  <small id="micPermissionHelp">The recorder will ask for access when needed.</small>
+                </article>
+                <label>
+                  ASR model
+                  <select id="asrModelSwitcher">
+                    <option value="mock">Mock local ASR</option>
+                    <option value="whisper">Whisper</option>
+                    <option value="faster_whisper">faster-whisper</option>
+                    <option value="wav2vec2">Wav2Vec2 / XLS-R</option>
+                    <option value="hf_finetuned">Fine-tuned AfriVoice</option>
+                  </select>
+                </label>
+              </div>
+              <div id="waveform" class="waveform" aria-label="Recording waveform">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div id="streamingTranscript" class="streaming-transcript empty">Streaming transcript will appear while recording.</div>
+              <audio id="recordedAudio" controls></audio>
+              <div id="currentSpeechRecord" class="current-speech-record">
+                <span class="insight-label">Current speech record</span>
+                <strong>No active record yet</strong>
+                <p>Record or upload audio to save speech history with transcript, language, date, time, and duration.</p>
+              </div>
+            </div>
+            <form id="uploadForm" class="upload-form">
+              <label>
+                Audio file
+                <input name="file" type="file" accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg" required />
+              </label>
+              <div class="form-row">
+                <label>
+                  Language
+                  <select name="language">
+                    <option value="">Auto detect</option>
+                    <option value="swa">Swahili</option>
+                    <option value="kik">Kikuyu</option>
+                    <option value="luo">Luo / Dholuo</option>
+                    <option value="som">Somali</option>
+                    <option value="mas">Maasai</option>
+                    <option value="kln">Kalenjin</option>
+                  </select>
+                </label>
+                <label>
+                  Domain
+                  <select name="domain">
+                    <option value="">General</option>
+                    <option value="health">Health</option>
+                    <option value="agriculture">Agriculture</option>
+                    <option value="education">Education</option>
+                    <option value="government">Government</option>
+                    <option value="finance">Finance</option>
+                  </select>
+                </label>
+                <label>
+                  Translate to
+                  <select name="translate_to">
+                    <option value="">No translation</option>
+                    <option value="swa">Swahili</option>
+                    <option value="kik">Kikuyu</option>
+                    <option value="luo">Dholuo</option>
+                    <option value="som">Somali</option>
+                    <option value="mas">Maasai</option>
+                    <option value="kln">Kalenjin</option>
+                    <option value="eng">English</option>
+                    <option value="spa">Spanish</option>
+                    <option value="fra">French</option>
+                    <option value="por">Portuguese</option>
+                    <option value="rus">Russian</option>
+                    <option value="deu">German</option>
+                    <option value="ita">Italian</option>
+                    <option value="ukr">Ukrainian</option>
+                    <option value="pol">Polish</option>
+                    <option value="nld">Dutch</option>
+                    <option value="ron">Romanian</option>
+                    <option value="ell">Greek</option>
+                    <option value="ces">Czech</option>
+                    <option value="swe">Swedish</option>
+                    <option value="hun">Hungarian</option>
+                  </select>
+                </label>
+              </div>
+              <div class="toggle-row">
+                <label><input type="checkbox" name="diarize" /> Speaker labels</label>
+                <label><input type="checkbox" name="return_segments" checked /> Segment output</label>
+              </div>
+              <button class="primary" type="submit">Run transcription</button>
+            </form>
+            <div id="uploadProgress" class="upload-progress" aria-live="polite"></div>
+            <div id="exportActions" class="export-actions" hidden>
+              <button data-export="txt" type="button">Download .txt</button>
+              <button data-export="json" type="button">Download .json</button>
+              <button data-export="csv" type="button">Download .csv</button>
+            </div>
+            <div class="asr-insight-grid">
+              <article class="insight-card detection-card">
+                <span class="insight-label">Language auto-detection</span>
+                <strong id="detectedLanguage">Waiting for speech</strong>
+                <p id="detectedLanguageNote">Run transcription to detect Swahili, Kikuyu, Luo, Somali, Maasai, or Kalenjin.</p>
+                <label>
+                  Override language
+                  <select id="languageOverride">
+                    <option value="">Keep detected language</option>
+                    <option value="swa">Swahili</option>
+                    <option value="kik">Kikuyu</option>
+                    <option value="luo">Luo / Dholuo</option>
+                    <option value="som">Somali</option>
+                    <option value="mas">Maasai</option>
+                    <option value="kln">Kalenjin</option>
+                  </select>
+                </label>
+              </article>
+              <article class="insight-card">
+                <span class="insight-label">Live confidence timeline</span>
+                <div id="confidenceTimeline" class="confidence-timeline empty">Transcript confidence will appear here word by word.</div>
+              </article>
+            </div>
+            <article class="insight-card transcript-highlight-card">
+              <span class="insight-label">Transcript confidence highlights</span>
+              <div id="confidenceTranscript" class="confidence-transcript empty">Low-confidence words will be highlighted here after transcription.</div>
+            </article>
+            <div class="asr-insight-grid">
+              <article class="insight-card">
+                <span class="insight-label">Speaker diarization</span>
+                <div id="speakerDiarization" class="speaker-stack empty">Enable speaker labels or run transcription to view speaker turns.</div>
+              </article>
+              <article class="insight-card">
+                <span class="insight-label">Audio waveform sync</span>
+                <p class="muted">Click a word below to jump the audio preview to that timestamp.</p>
+                <div id="waveformTranscriptSync" class="sync-words empty">No synchronized words yet.</div>
+              </article>
+            </div>
+            <pre id="resultBox" class="result">Waiting for an audio upload...</pre>
+          </section>
+
+          <section class="panel" id="history">
+            <div class="section-head">
+              <h2>Speech Library</h2>
+              <span class="muted">Saved audio, transcript, language, confidence, replay, edit, delete, and export</span>
+            </div>
+            <div class="library-search-row">
+              <label>
+                Search records
+                <input id="recordSearch" type="search" placeholder="Search language, filename, transcript, date, confidence, needs review" autocomplete="off" />
+              </label>
+              <div id="workspaceSummary" class="workspace-summary">Sign in to save this workspace profile locally.</div>
+            </div>
+            <div id="historyEmpty" class="empty-state">
+              <h3>No transcriptions yet</h3>
+              <p>Record or upload audio to build your transcript history.</p>
+              <button class="primary" type="button" data-jump="transcribe">Create first transcript</button>
+            </div>
+            <div class="records-toolbar">
+              <div>
+                <span class="insight-label">Records keeping</span>
+                <strong id="speechRecordSummary">No saved speech records yet</strong>
+              </div>
+              <div class="records-actions">
+                <button id="exportRecordsButton" class="secondary-action" type="button">Export records .json</button>
+                <button class="secondary-action" type="button" data-jump="transcribe">Add new record</button>
+              </div>
+            </div>
+            <div id="speechRecordTimeline" class="speech-record-timeline"></div>
+            <div id="historyTable" class="table-wrap"></div>
+          </section>
+
+          <section class="panel" id="editor">
+            <div class="section-head">
+              <h2>Transcript Editor</h2>
+              <span class="muted">Correct a transcript and feed it back into training</span>
+            </div>
+            <form id="feedbackForm" class="upload-form">
+              <label>
+                Transcription ID
+                <input name="transcription_id" placeholder="Paste ID from the Transcribe result" required />
+              </label>
+              <label>
+                Corrected transcript
+                <textarea name="corrected_text" rows="6" placeholder="Type the corrected transcript here" required></textarea>
+              </label>
+              <div class="form-row">
+                <label>
+                  Language
+                  <select name="language">
+                    <option value="swa">Swahili</option>
+                    <option value="kik">Kikuyu</option>
+                    <option value="luo">Luo / Dholuo</option>
+                    <option value="som">Somali</option>
+                    <option value="mas">Maasai</option>
+                    <option value="kln">Kalenjin</option>
+                  </select>
+                </label>
+                <label>
+                  Notes
+                  <input name="notes" placeholder="Optional review note" />
+                </label>
+              </div>
+              <button class="primary" type="submit">Save correction</button>
+            </form>
+            <pre id="feedbackBox" class="result compact">Corrections will appear here.</pre>
+            <div class="editor-workbench">
+              <article class="insight-card">
+                <div class="section-head compact-head">
+                  <h2>Human review queue</h2>
+                  <span class="muted">Approve, reject, or correct transcripts before feedback training</span>
+                </div>
+                <div id="reviewQueue" class="review-queue"></div>
+              </article>
+              <article class="insight-card">
+                <div class="section-head compact-head">
+                  <h2>Transcript version history</h2>
+                  <span class="muted">Compare original ASR output with corrected versions</span>
+                </div>
+                <div id="versionHistory" class="version-history empty">No transcript versions saved yet.</div>
+              </article>
+            </div>
+            <article class="insight-card contribution-card">
+              <div>
+                <span class="insight-label">Dataset contribution flow</span>
+                <strong>Donate corrected audio/transcript pairs to the training queue</strong>
+                <p>Approved corrections are packaged with language, domain, reviewer note, and source transcript ID for dataset cleanup.</p>
+              </div>
+              <button id="contributeButton" class="secondary-action" type="button">Add latest correction to contribution queue</button>
+              <pre id="contributionBox" class="result compact">No dataset contribution prepared yet.</pre>
+            </article>
+          </section>
+
+          <section class="panel" id="batch">
+            <div class="section-head">
+              <h2>Batch Transcription</h2>
+              <span class="muted">Upload multiple files and export CSV or JSONL-ready output</span>
+            </div>
+            <form id="batchForm" class="upload-form">
+              <label>
+                Audio files
+                <input name="files" type="file" accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg" multiple required />
+              </label>
+              <div class="form-row">
+                <label>
+                  Language
+                  <select name="language">
+                    <option value="">Auto detect</option>
+                    <option value="swa">Swahili</option>
+                    <option value="kik">Kikuyu</option>
+                    <option value="luo">Luo / Dholuo</option>
+                    <option value="som">Somali</option>
+                    <option value="mas">Maasai</option>
+                    <option value="kln">Kalenjin</option>
+                  </select>
+                </label>
+                <label>
+                  Export format
+                  <select name="output_format">
+                    <option value="jsonl">JSONL</option>
+                    <option value="csv">CSV</option>
+                  </select>
+                </label>
+              </div>
+              <button class="primary" type="submit">Run batch</button>
+            </form>
+            <pre id="batchBox" class="result">Batch output will appear here.</pre>
+          </section>
+
+          <section class="panel" id="models">
+            <div class="section-head">
+              <h2>Model Comparison</h2>
+              <span id="offlineMode" class="status-dot">Checking offline mode</span>
+            </div>
+            <div id="modelQuality" class="quality-grid"></div>
+            <div class="asr-insight-grid">
+              <article class="insight-card">
+                <span class="insight-label">Offline readiness panel</span>
+                <div id="offlineReadinessPanel" class="offline-readiness"></div>
+              </article>
+              <article class="insight-card">
+                <span class="insight-label">Admin quality alerts</span>
+                <div id="adminQualityAlerts" class="alert-stack"></div>
+              </article>
+            </div>
+            <div id="modelComparison" class="table-wrap"></div>
+          </section>
+
+          <section class="panel" id="leaderboard">
+            <div class="destination-page compact-destination">
+              <p class="destination-kicker">Product</p>
+              <h1>Benchmarks</h1>
+              <p class="destination-lead">Compare ASR model quality by language, model size, latency, memory, and worst-language WER so the system is not only good on the largest language.</p>
+            </div>
+            <div id="leaderboardTable" class="table-wrap"></div>
+          </section>
+
+          <section class="panel" id="audit">
+            <div class="section-head">
+              <h2>Dataset Audit Dashboard</h2>
+              <span class="muted">Hours, speakers, domains, missing transcripts, corrupt files</span>
+            </div>
+            <div class="metric-grid" id="auditMetrics"></div>
+            <article class="insight-card admin-quality-center">
+              <span class="insight-label">Admin data quality center</span>
+              <div id="adminDataQualityCenter" class="admin-quality-list">Quality alerts will appear after audit data loads.</div>
+            </article>
+            <div id="auditBreakdown" class="table-wrap"></div>
+          </section>
+
+          <section class="panel" id="explorer">
+            <div class="destination-page compact-destination">
+              <p class="destination-kicker">Product</p>
+              <h1>Datasets</h1>
+              <p class="destination-lead">Explore language folders, Kaggle test data, local manifests, scripted versus unscripted sets, and dataset readiness for training and submissions.</p>
+            </div>
+            <div class="file-board">
+              <article class="folder-card">
+                <strong>swa</strong>
+                <span>Swahili source set</span>
+                <small>Scripted · unscripted · normalized text</small>
+              </article>
+              <article class="folder-card">
+                <strong>kik</strong>
+                <span>Kikuyu source set</span>
+                <small>Speaker-disjoint validation</small>
+              </article>
+              <article class="folder-card">
+                <strong>luo</strong>
+                <span>Luo / Dholuo source set</span>
+                <small>Domain metadata ready</small>
+              </article>
+              <article class="folder-card">
+                <strong>som</strong>
+                <span>Somali source set</span>
+                <small>Language ID candidate data</small>
+              </article>
+              <article class="folder-card">
+                <strong>mas</strong>
+                <span>Maasai source set</span>
+                <small>Low-resource balancing</small>
+              </article>
+              <article class="folder-card">
+                <strong>kln</strong>
+                <span>Kalenjin source set</span>
+                <small>Edge benchmark target</small>
+              </article>
+            </div>
+            <article class="insight-card local-dataset-card">
+              <div class="section-head compact-head">
+                <div>
+                  <h2>Local ANV test data</h2>
+                  <span class="muted">Uses the dataset path you provided and keeps KaggleHub sync one click away</span>
+                </div>
+                <div class="dataset-actions-inline">
+                  <button id="inspectLocalDatasetButton" class="secondary-action" type="button">Inspect provided data</button>
+                  <button id="importLocalDatasetButton" class="secondary-action" type="button">Prepare manifest</button>
+                </div>
+              </div>
+              <pre id="localDatasetBox" class="result compact">No local dataset inspected yet.</pre>
+            </article>
+          </section>
+
+          <section class="panel" id="activity">
+            <div class="section-head">
+              <h2>Activity Overview</h2>
+              <span class="muted">Live local backend summary</span>
+            </div>
+            <div class="metric-grid" id="analyticsGrid"></div>
+            <div class="chart">
+              <div class="chart-line"></div>
+              <div class="bar b1"></div>
+              <div class="bar b2"></div>
+              <div class="bar b3"></div>
+              <div class="bar b4"></div>
+              <div class="bar b5"></div>
+            </div>
+          </section>
+
+          <section class="panel" id="tools">
+            <div class="section-head">
+              <h2>ASR Tools</h2>
+              <span class="muted">Quality check, WER/CER, and custom vocabulary</span>
+            </div>
+            <div class="tool-grid">
+              <form id="qualityForm" class="upload-form">
+                <h3>Audio quality checker</h3>
+                <label>
+                  Audio file
+                  <input name="file" type="file" accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg" required />
+                </label>
+                <button class="primary" type="submit">Check audio</button>
+                <pre id="qualityBox" class="result compact">No audio checked yet.</pre>
+              </form>
+
+              <form id="werForm" class="upload-form">
+                <h3>WER calculator</h3>
+                <label>
+                  Reference text
+                  <textarea name="reference" rows="4" required>habari yako leo</textarea>
+                </label>
+                <label>
+                  Predicted text
+                  <textarea name="prediction" rows="4" required>habari yako</textarea>
+                </label>
+                <button class="primary" type="submit">Calculate WER/CER</button>
+                <pre id="werBox" class="result compact">No score calculated yet.</pre>
+              </form>
+
+              <form id="vocabularyForm" class="upload-form">
+                <h3>Custom vocabulary</h3>
+                <label>
+                  Domain
+                  <select name="domain">
+                    <option value="health">Health</option>
+                    <option value="agriculture">Agriculture</option>
+                    <option value="education">Education</option>
+                    <option value="government">Government</option>
+                    <option value="finance">Finance</option>
+                  </select>
+                </label>
+                <label>
+                  Important phrases
+                  <textarea name="phrases" rows="7">malaria
+maize harvest
+county office
+school fees</textarea>
+                </label>
+                <button class="primary" type="submit">Save phrases</button>
+                <pre id="vocabularyBox" class="result compact">No phrases added yet.</pre>
+              </form>
+            </div>
+            <article class="insight-card model-card-generator">
+              <div class="section-head compact-head">
+                <h2>Model card generator</h2>
+                <span class="muted">Create documentation for Kaggle, Hugging Face, or reviewers</span>
+              </div>
+              <button id="modelCardButton" class="primary" type="button">Generate model card</button>
+              <pre id="modelCardBox" class="result compact">No model card generated yet.</pre>
+            </article>
+          </section>
+
+          <section class="panel" id="integrations">
+            <div class="section-head">
+              <h2>Production Integrations</h2>
+              <span class="muted">Model adapters, dataset sync, training, roles, streaming, exports, and reports</span>
+            </div>
+            <div class="integration-grid">
+              <article class="integration-card wide">
+                <div class="section-head compact-head">
+                  <h2>Real ASR model adapter</h2>
+                  <span class="muted">Whisper, faster-whisper, Wav2Vec2, or fine-tuned Hugging Face</span>
+                </div>
+                <div id="adapterList" class="adapter-list"></div>
+                <form id="adapterForm" class="mini-form">
+                  <select name="adapter_id">
+                    <option value="faster_whisper">faster-whisper</option>
+                    <option value="whisper">OpenAI Whisper</option>
+                    <option value="wav2vec2">Wav2Vec2 / XLS-R</option>
+                    <option value="hf_finetuned">Fine-tuned Hugging Face</option>
+                    <option value="mock">Mock runtime</option>
+                  </select>
+                  <input name="model_name" placeholder="Optional model name or Hugging Face repo" />
+                  <button class="primary" type="submit">Select adapter</button>
+                </form>
+                <pre id="adapterBox" class="result compact">No adapter selected yet.</pre>
+              </article>
+
+              <article class="integration-card">
+                <h3>Kaggle dataset downloader</h3>
+                <p>Queue the ANV test data sync using kagglehub and prepare a manifest.</p>
+                <button id="kaggleSyncButton" class="secondary-action" type="button">Sync Kaggle test data</button>
+                <pre id="kaggleSyncBox" class="result compact">No Kaggle sync job yet.</pre>
+              </article>
+
+              <article class="integration-card">
+                <h3>Hugging Face dataset sync</h3>
+                <p>Load AfriVoice datasets and build clean manifests for training.</p>
+                <button id="hfSyncButton" class="secondary-action" type="button">Sync AfriVoice datasets</button>
+                <pre id="hfSyncBox" class="result compact">No Hugging Face sync job yet.</pre>
+              </article>
+
+              <article class="integration-card wide">
+                <div class="section-head compact-head">
+                  <h2>Dataset sync status</h2>
+                  <span class="muted">Downloaded files, language coverage, missing transcripts, corrupt audio, and last sync</span>
+                </div>
+                <div id="datasetSyncStatus" class="dataset-sync-status"></div>
+              </article>
+
+              <article class="integration-card wide">
+                <div class="section-head compact-head">
+                  <h2>Training job dashboard</h2>
+                  <button id="createTrainingJobButton" class="secondary-action" type="button">Queue training job</button>
+                </div>
+                <div id="trainingJobs" class="training-jobs"></div>
+              </article>
+
+              <article class="integration-card">
+                <h3>Annotation team roles</h3>
+                <div id="roleMatrix" class="role-matrix"></div>
+              </article>
+
+              <article class="integration-card">
+                <h3>Streaming transcription</h3>
+                <p>Preview partial transcripts while recording is still active.</p>
+                <button id="streamingDemoButton" class="secondary-action" type="button">Preview streaming</button>
+                <div id="streamingDemoBox" class="streaming-partials"></div>
+              </article>
+
+              <article class="integration-card">
+                <h3>Translation layer</h3>
+                <form id="translationLayerForm" class="mini-form stacked">
+                  <textarea name="text" rows="4">habari yako leo</textarea>
+                  <select name="target_language">
+                    <option value="swa">Swahili</option>
+                    <option value="kik">Kikuyu</option>
+                    <option value="luo">Dholuo</option>
+                    <option value="som">Somali</option>
+                    <option value="mas">Maasai</option>
+                    <option value="kln">Kalenjin</option>
+                    <option value="eng">English</option>
+                    <option value="spa">Spanish</option>
+                    <option value="fra">French</option>
+                    <option value="por">Portuguese</option>
+                    <option value="rus">Russian</option>
+                    <option value="deu">German</option>
+                    <option value="ita">Italian</option>
+                    <option value="ukr">Ukrainian</option>
+                    <option value="pol">Polish</option>
+                    <option value="nld">Dutch</option>
+                    <option value="ron">Romanian</option>
+                    <option value="ell">Greek</option>
+                    <option value="ces">Czech</option>
+                    <option value="swe">Swedish</option>
+                    <option value="hun">Hungarian</option>
+                  </select>
+                  <button class="secondary-action" type="submit">Translate text</button>
+                </form>
+                <pre id="translationLayerBox" class="result compact">No translation yet.</pre>
+              </article>
+
+              <article class="integration-card">
+                <h3>Text-to-speech playback</h3>
+                <p>Generate a TTS preview job for corrected transcript playback.</p>
+                <button id="ttsButton" class="secondary-action" type="button">Create TTS preview</button>
+                <pre id="ttsBox" class="result compact">No TTS job yet.</pre>
+              </article>
+
+              <article class="integration-card">
+                <h3>Model deployment export</h3>
+                <p>Package ONNX, CTranslate2, or TensorFlow Lite artifacts.</p>
+                <button id="deploymentExportButton" class="secondary-action" type="button">Export edge package</button>
+                <pre id="deploymentExportBox" class="result compact">No deployment export yet.</pre>
+              </article>
+
+              <article class="integration-card">
+                <h3>Evaluation report export</h3>
+                <p>Generate PDF/CSV reports for WER, latency, memory, model size, and dataset quality.</p>
+                <button id="evaluationReportButton" class="secondary-action" type="button">Create report</button>
+                <pre id="evaluationReportBox" class="result compact">No report generated yet.</pre>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel" id="codeapi">
+            <div class="destination-page compact-destination">
+              <p class="destination-kicker">Product and Resources</p>
+              <h1>Notebooks and APIs</h1>
+              <p class="destination-lead">Code / API Integration for notebooks, mobile clients, backend services, and external tools using copyable endpoints and Python examples.</p>
+            </div>
+            <div class="endpoint-grid">
+              <article class="endpoint-card">
+                <span>POST</span>
+                <strong>/api/v1/transcriptions</strong>
+                <p>Upload one audio file and receive language, transcript, confidence, and segments.</p>
+                <button class="copy-command" data-copy="curl -X POST http://localhost:8000/api/v1/transcriptions -F 'file=@audio.wav' -F 'detect_language=true'">Copy curl</button>
+              </article>
+              <article class="endpoint-card">
+                <span>POST</span>
+                <strong>/api/v1/transcriptions/batch</strong>
+                <p>Send multiple audio files and return JSONL/CSV-ready batch output.</p>
+                <button class="copy-command" data-copy="curl -X POST http://localhost:8000/api/v1/transcriptions/batch -F 'files=@one.wav' -F 'files=@two.wav'">Copy curl</button>
+              </article>
+              <article class="endpoint-card">
+                <span>POST</span>
+                <strong>/api/v1/feedback</strong>
+                <p>Submit corrected transcripts for the human feedback loop.</p>
+                <button class="copy-command" data-copy='curl -X POST http://localhost:8000/api/v1/feedback -H "Content-Type: application/json" -d "{\"transcription_id\":\"trn_id\",\"corrected_text\":\"habari yako leo\"}"'>Copy curl</button>
+              </article>
+              <article class="endpoint-card">
+                <span>GET</span>
+                <strong>/api/v1/lab/leaderboard</strong>
+                <p>Read per-language WER scores for Swahili, Kikuyu, Luo, Somali, Maasai, and Kalenjin.</p>
+                <button class="copy-command" data-copy="curl http://localhost:8000/api/v1/lab/leaderboard">Copy curl</button>
+              </article>
+            </div>
+            <div class="code-panel">
+              <h3>Python client example</h3>
+              <pre class="result compact">import requests
+
+with open("audio.wav", "rb") as audio:
+    response = requests.post(
+        "http://localhost:8000/api/v1/transcriptions",
+        files={"file": audio},
+        data={"detect_language": "true", "return_segments": "true"},
+    )
+
+print(response.json())</pre>
+              <a class="docs-link" href="/docs">Open interactive API docs</a>
+            </div>
+          </section>
+
+          <section class="panel" id="competition">
+            <div class="destination-page">
+              <p class="destination-kicker">Product</p>
+              <h1>Competitions</h1>
+              <p class="destination-lead">Build, evaluate, and submit ASR systems for the AfriVoice East Africa challenge with one workspace for data, models, review, and Kaggle-ready outputs.</p>
+              <div class="destination-actions">
+                <button class="primary" type="button" data-jump="metadata">Build submission</button>
+                <button class="secondary-action" type="button" data-jump="leaderboard">View leaderboard</button>
+              </div>
+              <div class="destination-list">
+                <article><strong>AfriVoice EAC ASR Hackathon</strong><p>Unified ASR for Swahili, Kikuyu, Luo, Somali, Maasai, and Kalenjin.</p><span>Active workspace</span></article>
+                <article><strong>Metric</strong><p>Track WER, CER, confidence, latency, memory, and model size before submission.</p><span>WER focused</span></article>
+                <article><strong>Submission workflow</strong><p>Select a model, run predictions on test data, generate submission.csv, and keep audit logs.</p><span>Kaggle ready</span></article>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="hackathon">
+            <div class="destination-page">
+              <p class="destination-kicker">Product</p>
+              <h1>Hackathons</h1>
+              <p class="destination-lead">A guided build flow for taking the East African ASR project from raw audio to reviewed transcripts, model comparison, and edge deployment.</p>
+              <div class="destination-list">
+                <article><strong>1. Prepare data</strong><p>Audit language coverage, missing transcripts, corrupt files, and scripted versus unscripted balance.</p><button class="inline-link" type="button" data-jump="audit">Open dataset audit</button></article>
+                <article><strong>2. Train and compare</strong><p>Compare baseline Whisper, fine-tuned AfriVoice, and quantized edge model outputs.</p><button class="inline-link" type="button" data-jump="models">Open model quality</button></article>
+                <article><strong>3. Review transcripts</strong><p>Use human corrections and custom vocabulary to improve low-resource language quality.</p><button class="inline-link" type="button" data-jump="history">Open history</button></article>
+                <article><strong>4. Submit and deploy</strong><p>Create Kaggle submissions and package the best edge-ready model for offline use.</p><button class="inline-link" type="button" data-jump="deployment">Open deployment</button></article>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="discussions">
+            <div class="section-head">
+              <h2>Discussions</h2>
+              <span class="muted">Collect review notes, language issues, and model decisions</span>
+            </div>
+            <div class="discussion-board">
+              <article><strong>Maasai review queue</strong><p>Flag low-confidence transcripts and route them to correction before retraining.</p><span>Needs review</span></article>
+              <article><strong>Edge model notes</strong><p>Track memory, latency, and quantization decisions for offline deployment.</p><span>Active</span></article>
+              <article><strong>Dataset questions</strong><p>Record missing speaker metadata, corrupt files, and language-label questions.</p><span>Open</span></article>
+            </div>
+          </section>
+
+          <section class="panel" id="learn">
+            <div class="section-head">
+              <h2>Learn</h2>
+              <span class="muted">Short operating guide for users and reviewers</span>
+            </div>
+            <div class="learning-grid">
+              <article><strong>Record</strong><p>Capture speech, check quality, and run ASR with automatic language detection.</p></article>
+              <article><strong>Review</strong><p>Open transcript history, inspect confidence, and correct low-confidence results.</p></article>
+              <article><strong>Evaluate</strong><p>Use WER/CER, leaderboard, and model quality dashboards before submission.</p></article>
+              <article><strong>Export</strong><p>Download TXT, JSON, CSV, or prepare a Kaggle submission job.</p></article>
+            </div>
+          </section>
+
+          <section class="panel" id="documentation">
+            <div class="destination-page">
+              <p class="destination-kicker">Resources</p>
+              <h1>Documentation</h1>
+              <p class="destination-lead">Everything users need to run the ASR workflow, test backend endpoints, connect models, and deploy locally or on edge devices.</p>
+              <div class="destination-list compact">
+                <article><strong>API reference</strong><p>Open the FastAPI docs to test transcription, history, jobs, dataset sync, audit logs, and exports.</p><a class="inline-link" href="/docs">Open interactive API docs</a></article>
+                <article><strong>Local workflow</strong><p>Record or upload audio, inspect quality, run ASR, edit transcripts, replay saved audio, and export TXT/JSON/CSV.</p><button class="inline-link" type="button" data-jump="transcribe">Open ASR workspace</button></article>
+                <article><strong>Model workflow</strong><p>Switch between mock, Whisper, faster-whisper, fine-tuned Hugging Face, and edge quantized adapters.</p><button class="inline-link" type="button" data-jump="integrations">Open integrations</button></article>
+                <article><strong>Deployment workflow</strong><p>Review cloud storage, queue, model export, security checklist, and offline readiness.</p><button class="inline-link" type="button" data-jump="deployment">Open deployment</button></article>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="rankings">
+            <div class="section-head">
+              <h2>Kaggle Rankings</h2>
+              <span class="muted">Internal progress view for challenge readiness</span>
+            </div>
+            <div class="rankings-board">
+              <article><span>1</span><strong>Swahili</strong><p>Ready · best current language coverage</p></article>
+              <article><span>2</span><strong>Luo</strong><p>Ready · needs more edge latency checks</p></article>
+              <article><span>3</span><strong>Somali</strong><p>Ready · watch domain vocabulary</p></article>
+              <article><span>4</span><strong>Maasai</strong><p>Needs review · prioritize human correction</p></article>
+            </div>
+          </section>
+
+          <section class="panel" id="blog">
+            <div class="destination-page">
+              <p class="destination-kicker">Resources</p>
+              <h1>Blog</h1>
+              <p class="destination-lead">Project notes for building a practical East African ASR platform: data quality, model readiness, human review, and Kaggle submission strategy.</p>
+              <div class="destination-list">
+                <article><strong>Building for low-resource ASR</strong><p>How language balance, noisy audio detection, and human review improve recognition across six languages.</p><button class="inline-link" type="button" data-jump="audit">Read with dataset audit</button></article>
+                <article><strong>Edge deployment notes</strong><p>What to watch before taking Whisper-style ASR offline: model size, memory, latency, and quantization.</p><button class="inline-link" type="button" data-jump="deployment">Open readiness</button></article>
+                <article><strong>Submission workflow</strong><p>How the Kaggle dataset sync, local manifest, model switcher, and submission builder fit together.</p><button class="inline-link" type="button" data-jump="metadata">Build submission</button></article>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="hostcompetition">
+            <div class="destination-page">
+              <p class="destination-kicker">Resources</p>
+              <h1>Host a Competition</h1>
+              <p class="destination-lead">Create a complete ASR challenge workflow with hidden test data, evaluation metrics, reviewer roles, and submission exports.</p>
+              <div class="destination-list compact">
+                <article><strong>Dataset package</strong><p>Prepare audio manifests, language splits, license notes, and hidden test files.</p></article>
+                <article><strong>Metric setup</strong><p>Use WER/CER, latency, memory, model size, and per-language leaderboard checks.</p></article>
+                <article><strong>Review workflow</strong><p>Assign low-confidence transcripts to reviewers before adding them to training data.</p></article>
+                <article><strong>Operations</strong><p>Run long audio, batch jobs, dataset sync, and evaluation reports through trackable background jobs.</p><button class="inline-link" type="button" data-jump="jobs">Open jobs</button></article>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="guidelines">
+            <div class="destination-page">
+              <p class="destination-kicker">Resources</p>
+              <h1>Community Guidelines</h1>
+              <p class="destination-lead">Responsible rules for speech collection, transcript correction, dataset contribution, and model deployment.</p>
+              <div class="policy-list">
+                <h2>Speech data</h2>
+                <a href="#guidelines">Collect audio only with speaker consent</a>
+                <a href="#guidelines">Keep language, dialect, and domain context attached</a>
+                <a href="#guidelines">Route noisy and low-confidence speech through human review</a>
+                <h2>Review behavior</h2>
+                <a href="#guidelines">Preserve names, places, health terms, and local vocabulary</a>
+                <a href="#guidelines">Do not approve transcripts that are incomplete or harmful</a>
+                <a href="#guidelines">Use audit logs for corrections, exports, deletes, and assignments</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="team">
+            <div class="destination-page">
+              <p class="destination-kicker">Company</p>
+              <h1>Our Team</h1>
+              <p class="destination-lead">The workspace is organized around the roles needed to operate an ASR product: secure administration, human review, annotation, and read-only visibility.</p>
+              <div class="destination-list">
+                <article><strong>Admin</strong><p>Manages users, roles, settings, jobs, dataset sync, storage, and audit logs.</p><span>Full access</span></article>
+                <article><strong>Reviewer</strong><p>Approves, rejects, or corrects transcripts before they enter the feedback dataset.</p><span>Quality control</span></article>
+                <article><strong>Annotator</strong><p>Adds corrections, speaker labels, translations, language notes, and custom vocabulary.</p><span>Dataset cleanup</span></article>
+                <article><strong>Viewer</strong><p>Reviews dashboards, reports, model readiness, and evaluation results without changing data.</p><span>Read only</span></article>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="contact">
+            <div class="destination-page contact-destination">
+              <h1>Contact</h1>
+              <p class="destination-lead">Thanks for your interest in Kaggle. A lot of the common inquiries we receive are listed below. Please click on the one that applies to you to learn more.</p>
+              <div class="policy-list">
+                <h2>Account/Login</h2>
+                <a href="#contact" data-contact-topic="I cannot activate my account">I cannot activate my account</a>
+                <a href="#contact" data-contact-topic="I'd like to change my profile or login details">I'd like to change my...</a>
+                <a href="#contact" data-contact-topic="I want to appeal an enforcement action">I want to appeal an enforcement action taken against my account or content</a>
+                <a href="#contact" data-contact-topic="I want to appeal a content decision">I want to appeal Kaggle's decision not to take action on content that I reported</a>
+                <a href="#contact" data-contact-topic="I am blocked from accessing my account">I am blocked from accessing my account?</a>
+                <a href="#contact" data-contact-topic="I'd like to delete my account">I'd like to delete my account</a>
+                <a href="#contact" data-contact-topic="I'd like to withdraw my account">I'd like to withdraw my account</a>
+                <a href="#contact" data-contact-topic="I am having problems changing my login method">I am having problems changing my login method</a>
+                <a href="#contact" data-contact-topic="I have a question about identity verification">I have a question about identity verification</a>
+                <h2>ASR Workspace</h2>
+                <a href="#contact" data-contact-topic="Dataset issue">I need help with dataset sync or Kaggle test data</a>
+                <a href="#contact" data-contact-topic="Model behavior">I need help with transcription, model quality, or language results</a>
+                <a href="#contact" data-contact-topic="Submission support">I need help preparing a Kaggle submission</a>
+              </div>
+              <form id="contactForm" class="inline-contact-form">
+                <label>
+                  Topic
+                  <select name="topic">
+                    <option>Dataset issue</option>
+                    <option>Model behavior</option>
+                    <option>Submission support</option>
+                    <option>Account or role access</option>
+                  </select>
+                </label>
+                <label>
+                  Message
+                  <textarea name="message" rows="4" placeholder="Describe what users need help with." required></textarea>
+                </label>
+                <button class="primary" type="submit">Save support note</button>
+              </form>
+              <pre id="contactBox" class="result compact">No support note submitted yet.</pre>
+            </div>
+          </section>
+
+          <section class="panel" id="terms">
+            <div class="destination-page">
+              <p class="destination-kicker">Company</p>
+              <h1>Terms</h1>
+              <p class="destination-lead">Workspace terms for using speech data, review workflows, model exports, and Kaggle-style challenge outputs responsibly.</p>
+              <div class="policy-list">
+                <h2>Using this workspace</h2>
+                <a href="#terms">Keep dataset attribution in manifests, exports, and model cards</a>
+                <a href="#terms">Use review assignments for low-confidence or sensitive transcripts</a>
+                <a href="#terms">Do not export contributed speech without consent and source notes</a>
+                <h2>Model outputs</h2>
+                <a href="#terms">Include known limitations for weak languages and noisy audio</a>
+                <a href="#terms">Validate edge exports before offline deployment</a>
+                <a href="#terms">Track uploads, edits, deletes, exports, and evaluations in audit logs</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="privacy">
+            <div class="destination-page">
+              <p class="destination-kicker">Company</p>
+              <h1>Privacy Policy</h1>
+              <p class="destination-lead">How this ASR workspace treats recordings, transcripts, corrections, user accounts, and model evaluation data.</p>
+              <div class="policy-list">
+                <h2>Data storage</h2>
+                <a href="#privacy">Recordings and transcripts stay in the configured workspace storage backend</a>
+                <a href="#privacy">User accounts own their saved speech history, corrections, and exports</a>
+                <a href="#privacy">Admins can review audit logs for uploads, edits, deletes, jobs, and evaluations</a>
+                <h2>Dataset contribution</h2>
+                <a href="#privacy">Corrected audio/transcript pairs are contributed only through an explicit flow</a>
+                <a href="#privacy">Low-confidence records stay in review before training use</a>
+                <a href="#privacy">Model cards should document limitations, intended use, and ethical notes</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="support">
+            <div class="section-head">
+              <h2>More</h2>
+              <span class="muted">Extra workspace areas and help when users get stuck</span>
+            </div>
+            <div class="support-grid">
+              <article><strong>ASR Workspace</strong><p>Record or upload speech, choose language, and run transcription.</p><button class="secondary-action" type="button" data-jump="transcribe">Open workspace</button></article>
+              <article><strong>History</strong><p>Review previous transcripts, confidence scores, timestamps, and exports.</p><button class="secondary-action" type="button" data-jump="history">Open history</button></article>
+              <article><strong>Models</strong><p>Compare WER, latency, memory, model size, and edge readiness.</p><button class="secondary-action" type="button" data-jump="models">Open models</button></article>
+              <article><strong>Audio will not upload</strong><p>Check format, size, silence, clipping, and browser microphone permissions.</p></article>
+              <article><strong>Language looks wrong</strong><p>Try manually selecting the language before transcription and submit a correction.</p></article>
+              <article><strong>Need API help</strong><p>Open the interactive API docs or copy the curl examples from Code / API.</p></article>
+            </div>
+          </section>
+
+          <section class="panel" id="metadata">
+            <div class="section-head">
+              <h2>Metadata</h2>
+              <button id="submissionButton">Create Kaggle job</button>
+            </div>
+            <div class="accordion">
+              <details open>
+                <summary>Kaggle submission builder</summary>
+                <p>Select a model, generate predictions for the test dataset, validate the file shape, preview rows, and write a submission artifact.</p>
+                <form id="submissionBuilderForm" class="mini-form submission-builder-form">
+                  <select name="model_name" aria-label="Submission model">
+                    <option value="Fine-tuned AfriVoice">Fine-tuned AfriVoice</option>
+                    <option value="Whisper baseline">Whisper baseline</option>
+                    <option value="faster-whisper">faster-whisper</option>
+                    <option value="Wav2Vec2 / XLS-R">Wav2Vec2 / XLS-R</option>
+                  </select>
+                  <input name="dataset_name" value="digitalumuganda/anv-test-data-nt" aria-label="Dataset name" />
+                  <button class="primary" type="submit">Generate submission.csv</button>
+                </form>
+                <pre id="submissionBox" class="result compact">No submission job created yet.</pre>
+              </details>
+              <details open>
+                <summary>Datasets</summary>
+                <p>Hugging Face AfriVoice Swahili, MCAA1-MSU ANV Kenya data, and Kaggle ANV test data.</p>
+              </details>
+              <details open>
+                <summary>License and usage</summary>
+                <p>Keep dataset license requirements in the model card and preserve source attribution in manifests.</p>
+              </details>
+            </div>
+          </section>
+
+          <section class="panel" id="jobs">
+            <div class="section-head">
+              <h2>Background Jobs</h2>
+              <button id="createJobButton" class="primary" type="button">Start sample job</button>
+            </div>
+            <p class="lead">Long audio, batch transcription, dataset sync, and report exports run as trackable jobs with progress, logs, retry, and cancel.</p>
+            <div id="jobsBoard" class="ops-grid"></div>
+          </section>
+
+          <section class="panel" id="evaluation">
+            <div class="section-head">
+              <h2>Model Evaluation Runs</h2>
+              <span class="muted">Compare WER and CER by model and dataset</span>
+            </div>
+            <form id="evaluationForm" class="tool-form inline-tool-form">
+              <label>
+                Model
+                <select name="model_name">
+                  <option>Fine-tuned AfriVoice</option>
+                  <option>Whisper baseline</option>
+                  <option>faster-whisper</option>
+                  <option>Edge quantized</option>
+                </select>
+              </label>
+              <label>
+                Dataset
+                <input name="dataset_name" value="AfriVoice validation" />
+              </label>
+              <button class="primary" type="submit">Run evaluation</button>
+            </form>
+            <div id="evaluationBoard" class="ops-grid"></div>
+          </section>
+
+          <section class="panel" id="deployment">
+            <div class="section-head">
+              <h2>Deployment Readiness</h2>
+              <span class="muted">Cloud and edge launch checklist</span>
+            </div>
+            <div id="deploymentReadiness" class="readiness-grid"></div>
+          </section>
+
+          <section class="panel" id="settings">
+            <div class="section-head">
+              <h2>Settings</h2>
+              <span class="muted">API keys, model choices, storage, queue, exports, and notifications</span>
+            </div>
+            <form id="settingsForm" class="tool-form settings-form">
+              <label>
+                Default model
+                <select name="default_model">
+                  <option value="mock">Mock AfriVoice</option>
+                  <option value="whisper">Whisper</option>
+                  <option value="faster_whisper">faster-whisper</option>
+                  <option value="hf_finetuned">Fine-tuned Hugging Face</option>
+                </select>
+              </label>
+              <label>
+                Dataset path
+                <input name="dataset_path" placeholder="outputs/local_data" />
+              </label>
+              <label>
+                Export format
+                <select name="export_format">
+                  <option value="json">JSON</option>
+                  <option value="csv">CSV</option>
+                  <option value="jsonl">JSONL</option>
+                </select>
+              </label>
+              <label>
+                Notifications
+                <select name="notifications">
+                  <option value="toast">Toast notifications</option>
+                  <option value="quiet">Quiet mode</option>
+                </select>
+              </label>
+              <button class="primary" type="submit">Save settings</button>
+            </form>
+            <div id="settingsRuntime" class="readiness-grid"></div>
+          </section>
+
+          <section class="panel" id="auditlog">
+            <div class="section-head">
+              <h2>Audit Logs</h2>
+              <span class="muted">Track uploads, deletes, review assignments, evaluations, settings, and jobs</span>
+            </div>
+            <div id="auditLogTable" class="table-wrap"></div>
+          </section>
+        </div>
+
+        <aside class="side-panel">
+          <h2>Workspace</h2>
+          <div class="tree">
+            <strong>afrivoice-eac-asr</strong>
+            <span>api / FastAPI</span>
+            <span>models / active</span>
+            <span>data / manifests</span>
+            <span>edge / offline CLI</span>
+            <span>feedback / corrections</span>
+          </div>
+          <h2>Languages</h2>
+          <div id="languageList" class="language-list"></div>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="kaggle-footer" aria-label="Kaggle footer navigation">
+      <section class="footer-brand">
+        <div class="footer-logo" aria-label="Kaggle">kaggle</div>
+        <div class="social-row" aria-label="Social links">
+          <button type="button" data-external-url="https://x.com/kaggle" aria-label="Open Kaggle on X">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2.8h3.1l-6.8 7.8 8 10.6h-6.3l-4.9-6.4-5.6 6.4H3.3l7.3-8.3L3 2.8h6.4l4.4 5.8 5.1-5.8Zm-1.1 16.5h1.7L8.5 4.6H6.7l11.1 14.7Z"></path></svg>
+          </button>
+          <button type="button" data-external-url="https://www.linkedin.com/company/kaggle" aria-label="Open Kaggle on LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3h-17A1.5 1.5 0 0 0 2 4.5v15A1.5 1.5 0 0 0 3.5 21h17a1.5 1.5 0 0 0 1.5-1.5v-15A1.5 1.5 0 0 0 20.5 3ZM8.2 18.2H5.5V9.7h2.7v8.5ZM6.9 8.5a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2Zm11.8 9.7H16v-4.1c0-1 0-2.3-1.4-2.3s-1.6 1.1-1.6 2.2v4.2h-2.7V9.7h2.6v1.2h.1c.4-.7 1.2-1.4 2.5-1.4 2.7 0 3.2 1.8 3.2 4.1v4.6Z"></path></svg>
+          </button>
+          <button type="button" data-external-url="https://www.youtube.com/@kaggle" aria-label="Open Kaggle on YouTube">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 7.8a3 3 0 0 0-2.1-2.1C18 5.2 12 5.2 12 5.2s-6 0-7.9.5A3 3 0 0 0 2 7.8 31.3 31.3 0 0 0 1.5 12c0 1.4.1 2.8.5 4.2a3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1c.4-1.4.5-2.8.5-4.2s-.1-2.8-.5-4.2ZM9.9 15.2V8.8l5.5 3.2-5.5 3.2Z"></path></svg>
+          </button>
+          <button type="button" data-footer-jump="discussions" aria-label="Open community discussions">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 5.3A16.2 16.2 0 0 0 16.1 4l-.2.4c1.5.4 2.9 1.1 4.1 2.1a13.8 13.8 0 0 0-5-1.6 14.5 14.5 0 0 0-6 0 13.8 13.8 0 0 0-5 1.6 11.6 11.6 0 0 1 4.1-2.1L7.9 4a16.2 16.2 0 0 0-4.1 1.3C1.2 9.2.5 13 .8 16.8A16.5 16.5 0 0 0 5.9 19.4l1-1.4a9.4 9.4 0 0 1-1.6-.8l.4-.3a11.6 11.6 0 0 0 12.6 0l.4.3c-.5.3-1 .6-1.6.8l1 1.4a16.5 16.5 0 0 0 5.1-2.6c.4-4.4-.7-8.1-3-11.5ZM8.5 14.6c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm7 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"></path></svg>
+          </button>
+        </div>
+      </section>
+      <nav class="footer-column" aria-label="Product">
+        <h2>Product</h2>
+        <button type="button" data-footer-jump="competition">Competitions</button>
+        <button type="button" data-footer-jump="hackathon">Hackathons</button>
+        <button type="button" data-footer-jump="leaderboard">Benchmarks</button>
+        <button type="button" data-footer-jump="explorer" data-footer-action="inspect-local-dataset">Datasets</button>
+        <button type="button" data-footer-jump="codeapi">Notebooks</button>
+      </nav>
+      <nav class="footer-column" aria-label="Resources">
+        <h2>Resources</h2>
+        <button type="button" data-footer-jump="documentation">Documentation</button>
+        <button type="button" data-footer-jump="blog">Blog</button>
+        <button type="button" data-footer-jump="hostcompetition">Host a Competition</button>
+        <button type="button" data-footer-jump="codeapi">APIs</button>
+        <button type="button" data-footer-jump="guidelines">Community Guidelines</button>
+      </nav>
+      <nav class="footer-column" aria-label="Company">
+        <h2>Company</h2>
+        <button type="button" data-footer-jump="team">Our Team</button>
+        <button type="button" data-footer-jump="contact">Contact Us</button>
+        <button type="button" data-footer-jump="terms">Terms</button>
+        <button type="button" data-footer-jump="privacy">Privacy Policy</button>
+      </nav>
+    </footer>
+
+    <div id="authOverlay" class="auth-overlay" hidden>
+      <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+        <button id="authCloseButton" class="auth-close" type="button" aria-label="Close authentication dialog">×</button>
+        <p class="eyebrow">Kaggle ASR workspace</p>
+        <h2 id="authTitle">Sign in</h2>
+        <p id="authSubtitle" class="auth-copy">Access saved transcripts, submissions, model runs, and correction history.</p>
+
+        <form id="signInForm" class="auth-form">
+          <label>
+            Email address
+            <input name="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" placeholder="Enter password" autocomplete="current-password" minlength="6" required />
+          </label>
+          <button class="auth-submit" type="submit">Sign in</button>
+        </form>
+
+        <form id="registerForm" class="auth-form" hidden>
+          <div class="form-row auth-name-row">
+            <label>
+              First name
+              <input name="first_name" type="text" placeholder="First name" autocomplete="given-name" required />
+            </label>
+            <label>
+              Last name
+              <input name="last_name" type="text" placeholder="Last name" autocomplete="family-name" required />
+            </label>
+          </div>
+          <label>
+            Email address
+            <input name="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" placeholder="Create password" autocomplete="new-password" minlength="6" required />
+          </label>
+          <label class="auth-check">
+            <input name="terms" type="checkbox" required />
+            I agree to use the ASR workspace responsibly and keep dataset attribution.
+          </label>
+          <button class="auth-submit" type="submit">Create account</button>
+        </form>
+
+        <div id="authMessage" class="auth-message" role="status" aria-live="polite"></div>
+        <button id="authSwitchButton" class="auth-switch" type="button">New here? Create an account</button>
+      </section>
+    </div>
+
+    <div id="createOverlay" class="create-overlay" hidden>
+      <section class="create-dialog" role="dialog" aria-modal="true" aria-labelledby="createDialogTitle">
+        <button id="createCloseButton" class="auth-close" type="button" aria-label="Close create dialog">×</button>
+        <p id="createDialogEyebrow" class="eyebrow">Create workspace item</p>
+        <h2 id="createDialogTitle">Create item</h2>
+        <p id="createDialogSubtitle" class="auth-copy">Set up a reusable workspace item and open the right dashboard page.</p>
+
+        <form id="createItemForm" class="create-item-form">
+          <label>
+            Name
+            <input name="title" type="text" placeholder="Give it a clear name" required />
+          </label>
+          <label>
+            Description
+            <textarea name="description" rows="4" placeholder="What should this item help users do?" required></textarea>
+          </label>
+          <div class="form-row">
+            <label>
+              Primary language
+              <select name="language">
+                <option value="all">All languages</option>
+                <option value="swa">Swahili</option>
+                <option value="kik">Kikuyu</option>
+                <option value="luo">Luo / Dholuo</option>
+                <option value="som">Somali</option>
+                <option value="mas">Maasai</option>
+                <option value="kln">Kalenjin</option>
+              </select>
+            </label>
+            <label>
+              Status
+              <select name="status">
+                <option value="Draft">Draft</option>
+                <option value="Ready">Ready</option>
+                <option value="Needs review">Needs review</option>
+                <option value="In progress">In progress</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Tags
+            <input name="tags" type="text" placeholder="asr, kaggle, field-data" />
+          </label>
+          <div id="createTemplateHint" class="create-template-hint"></div>
+          <div class="create-dialog-actions">
+            <button id="createCancelButton" class="secondary-action" type="button">Cancel</button>
+            <button id="createSubmitButton" class="auth-submit" type="submit">Create</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <aside id="recordDrawer" class="record-drawer" hidden aria-label="Speech record details" role="dialog" aria-modal="false">
+      <button id="recordDrawerClose" class="drawer-close" type="button" aria-label="Close record details">×</button>
+      <div id="recordDrawerContent"></div>
+    </aside>
+    <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="/static/app.js?v=20260619-production-platform"></script>
+  </body>
+</html>
