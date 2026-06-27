@@ -4,7 +4,8 @@ WORKDIR /app
 ENV PYTHONPATH=/app/backend
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-render.txt .
+RUN pip install --no-cache-dir -r requirements-render.txt
 
 COPY . .
 
