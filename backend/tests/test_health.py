@@ -37,6 +37,21 @@ def test_lab_endpoints() -> None:
     assert wer.status_code == 200
     assert wer.json()["wer"] == 0.3333
 
+    accuracy = client.post(
+        "/api/v1/lab/accuracy",
+        json={
+            "samples": [
+                {"language": "swa", "reference": "habari yako leo", "prediction": "habari yako leo"},
+                {"language": "mas", "reference": "inkishu apa oleng", "prediction": "inkishu apa"},
+            ]
+        },
+    )
+    assert accuracy.status_code == 200
+    payload = accuracy.json()
+    assert payload["sample_count"] == 2
+    assert payload["overall"]["accuracy"] > 0
+    assert len(payload["by_language"]) == 2
+
     activity = client.get("/api/v1/lab/activity-detail")
     assert activity.status_code == 200
     assert activity.json()["summary"]["views"]["value"] == 35

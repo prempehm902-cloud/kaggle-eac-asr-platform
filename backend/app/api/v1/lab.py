@@ -2,7 +2,7 @@ from fastapi import APIRouter, File, Form, UploadFile
 from pydantic import BaseModel
 
 from app.core.audio_quality import inspect_audio
-from app.core.wer import calculate_wer_cer
+from app.core.wer import calculate_accuracy_report, calculate_wer_cer
 
 router = APIRouter()
 
@@ -10,6 +10,17 @@ router = APIRouter()
 class WerRequest(BaseModel):
     reference: str
     prediction: str
+
+
+class AccuracySample(BaseModel):
+    reference: str
+    prediction: str
+    language: str = "unknown"
+    filename: str | None = None
+
+
+class AccuracyRequest(BaseModel):
+    samples: list[AccuracySample]
 
 
 class VocabularyRequest(BaseModel):
@@ -101,6 +112,12 @@ def dataset_audit() -> dict:
 @router.post("/wer")
 def wer(payload: WerRequest) -> dict:
     return calculate_wer_cer(payload.reference, payload.prediction)
+
+
+@router.post("/accuracy")
+def accuracy(payload: AccuracyRequest) -> dict:
+    samples = [sample.model_dump() for sample in payload.samples]
+    return calculate_accuracy_report(samples)
 
 
 @router.get("/offline-status")

@@ -24,6 +24,9 @@ const qualityForm = document.querySelector("#qualityForm");
 const qualityBox = document.querySelector("#qualityBox");
 const werForm = document.querySelector("#werForm");
 const werBox = document.querySelector("#werBox");
+const accuracyForm = document.querySelector("#accuracyForm");
+const accuracyBox = document.querySelector("#accuracyBox");
+const accuracySummary = document.querySelector("#accuracySummary");
 const vocabularyForm = document.querySelector("#vocabularyForm");
 const vocabularyBox = document.querySelector("#vocabularyBox");
 const activityStrip = document.querySelector("#activityStrip");
@@ -2934,6 +2937,30 @@ qualityForm.addEventListener("submit", async (event) => {
   qualityBox.textContent = JSON.stringify(result, null, 2);
 });
 
+function parseAccuracySamples(rawText) {
+  return String(rawText || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const parts = line.split("|").map((part) => part.trim());
+      if (parts.length >= 3) {
+        return { language: parts[0] || "unknown", reference: parts[1] || "", prediction: parts.slice(2).join(" | ") || "", filename: `sample-${index + 1}` };
+      }
+      return { language: "unknown", reference: line, prediction: "", filename: `sample-${index + 1}` };
+    });
+}
+
+function renderAccuracySummary(result) {
+  if (!accuracySummary) return;
+  const overall = result.overall || {};
+  accuracySummary.innerHTML = [
+    metric("Overall accuracy", `${Math.round(Number(overall.accuracy || 0) * 1000) / 10}%`, `${result.sample_count || 0} scored samples`),
+    metric("Overall WER", overall.wer ?? "n/a", `${overall.word_errors || 0} word errors`),
+    metric("Overall CER", overall.cer ?? "n/a", "Character error rate"),
+  ].join("");
+}
+
 werForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   werBox.textContent = "Calculating WER/CER...";
@@ -2945,6 +2972,24 @@ werForm.addEventListener("submit", async (event) => {
   });
   const result = await response.json();
   werBox.textContent = JSON.stringify(result, null, 2);
+});
+
+
+accuracyForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!accuracyBox) return;
+  accuracyBox.textContent = "Scoring accuracy across samples...";
+  const formData = new FormData(accuracyForm);
+  const samples = parseAccuracySamples(formData.get("samples"));
+  const response = await fetch("/api/v1/lab/accuracy", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ samples }),
+  });
+  const result = await response.json();
+  renderAccuracySummary(result);
+  accuracyBox.textContent = JSON.stringify(result, null, 2);
+  showToast("Accuracy report generated.");
 });
 
 vocabularyForm.addEventListener("submit", async (event) => {

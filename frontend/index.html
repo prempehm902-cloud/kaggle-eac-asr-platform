@@ -758,6 +758,21 @@
                 <pre id="werBox" class="result compact">No score calculated yet.</pre>
               </form>
 
+              <form id="accuracyForm" class="upload-form accuracy-form">
+                <h3>Accuracy evaluation</h3>
+                <p class="muted">Score multiple reference and prediction pairs by language. Use one sample per line.</p>
+                <label>
+                  Samples
+                  <textarea name="samples" rows="7">swa | habari yako leo | habari yako leo
+mas | inkishu apa oleng | inkishu apa
+kln | chamgei missing | chamgei</textarea>
+                </label>
+                <small class="field-help">Format: language | reference transcript | predicted transcript</small>
+                <button class="primary" type="submit">Generate accuracy report</button>
+                <div id="accuracySummary" class="quality-grid compact-quality"></div>
+                <pre id="accuracyBox" class="result compact">No accuracy report generated yet.</pre>
+              </form>
+
               <form id="vocabularyForm" class="upload-form">
                 <h3>Custom vocabulary</h3>
                 <label>

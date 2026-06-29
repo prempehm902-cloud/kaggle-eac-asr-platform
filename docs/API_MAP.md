@@ -16,6 +16,14 @@
 - `POST /api/v1/transcriptions/batch`
 - `WebSocket /api/v1/transcriptions/stream`
 
+## Evaluation and Lab
+
+- `POST /api/v1/lab/wer`
+- `POST /api/v1/lab/accuracy`
+- `GET /api/v1/lab/model-comparison`
+- `GET /api/v1/lab/leaderboard`
+- `GET /api/v1/lab/dataset-audit`
+
 ## Review and Operations
 
 - `POST /api/v1/ops/reviews/assign`
