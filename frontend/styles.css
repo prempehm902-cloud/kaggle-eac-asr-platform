@@ -5332,3 +5332,36 @@ body.dark-theme .profile-url-card code {
 body.dark-theme .profile-summary-grid strong {
   color: #e5e7eb;
 }
+
+.validation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.validation-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.validation-status {
+  color: var(--danger);
+}
+
+.validation-status.ready {
+  color: var(--success);
+}
+
+.compact-grid {
+  margin-bottom: 14px;
+}

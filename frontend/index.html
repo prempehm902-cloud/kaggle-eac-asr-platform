@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AfriVoice EAC ASR Console</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260701-auth-fix" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260701-competition-validation" />
   </head>
   <body>
     <svg aria-hidden="true" class="icon-sprite">
@@ -1268,6 +1268,17 @@ print(response.json())</pre>
                 <pre id="submissionBox" class="result compact">No submission job created yet. Required header: id,language,prediction. Language must be ISO 639-3: swa, kik, luo, som, mas, kln.</pre>
               </details>
               <details open>
+                <summary>Competition final validation</summary>
+                <p>Run the supervisor checklist for exact CSV format, ISO language codes, real checkpoint evidence, full test inference, public weights, edge latency, and no manual test correction.</p>
+                <div class="validation-actions">
+                  <button id="competitionValidationButton" class="primary" type="button">Run final validation</button>
+                  <a class="docs-link" href="/docs#/competition-validation">Open validation API</a>
+                </div>
+                <div id="competitionValidationSummary" class="validation-summary">Validation has not run yet.</div>
+                <div id="competitionValidationGrid" class="readiness-grid compact-grid"></div>
+                <pre id="competitionValidationBox" class="result compact">Required artifacts: real model checkpoint metadata, full Kaggle test predictions, public weights URL, hardware latency report, model card, training logs, and no-manual-correction attestation.</pre>
+              </details>
+              <details open>
                 <summary>Datasets</summary>
                 <p>Hugging Face AfriVoice Swahili, MCAA1-MSU ANV Kenya data, and Kaggle ANV test data.</p>
               </details>
@@ -1534,6 +1545,6 @@ print(response.json())</pre>
     </aside>
     <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="/static/app.js?v=20260701-auth-fix"></script>
+    <script src="/static/app.js?v=20260701-competition-validation"></script>
   </body>
 </html>

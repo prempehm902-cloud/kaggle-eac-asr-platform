@@ -1,0 +1,14 @@
+{
+  "model_name": "fine-tuned-afrivoice-eac-asr",
+  "checkpoint_path": "models/checkpoints/fine-tuned-afrivoice-eac-asr",
+  "public_weights_url": "https://huggingface.co/YOUR_USERNAME/fine-tuned-afrivoice-eac-asr",
+  "license": "MIT",
+  "parameter_count": 244000000,
+  "edge_memory_gb": 4.5,
+  "training_data": [
+    "DigitalUmuganda/Afrivoice",
+    "DigitalUmuganda/Afrivoice_Swahili",
+    "MCAA1-MSU/anv_data_ke"
+  ],
+  "notes": "Copy this file to model-metadata.json and replace values with the real checkpoint details before final submission."
+}

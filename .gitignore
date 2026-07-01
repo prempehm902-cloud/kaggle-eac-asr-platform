@@ -16,6 +16,7 @@ env/
 *.local
 
 outputs/local_data/
+backend/outputs/
 data/raw/
 data/cache/
 models/checkpoints/

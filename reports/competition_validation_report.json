@@ -1,0 +1,120 @@
+{
+  "generated_at": "2026-07-01T16:56:10.074508+00:00",
+  "status": "blocked",
+  "passed": 3,
+  "failed": 8,
+  "submission_requirements": {
+    "required_columns": [
+      "id",
+      "language",
+      "prediction"
+    ],
+    "valid_language_codes": [
+      "swa",
+      "kik",
+      "luo",
+      "som",
+      "mas",
+      "kln"
+    ],
+    "language_column_rule": "Use 3-letter ISO 639-3 codes only, never full language names.",
+    "no_manual_test_audio_correction": true
+  },
+  "submission": {
+    "exists": true,
+    "path": "outputs/local_data/submissions/submission-4c0cee8e.csv",
+    "row_count": 3,
+    "valid": true,
+    "violations": []
+  },
+  "checks": [
+    {
+      "id": "submission_csv_format",
+      "label": "Kaggle CSV format",
+      "status": "pass",
+      "required": true,
+      "detail": "Latest CSV: outputs/local_data/submissions/submission-4c0cee8e.csv; rows: 3; violations: 0.",
+      "action": "Generate a submission from Metadata > Kaggle submission builder. Header must be id,language,prediction."
+    },
+    {
+      "id": "full_test_inference",
+      "label": "Full Kaggle test inference",
+      "status": "missing",
+      "required": true,
+      "detail": "Expected predictions manifest: outputs/local_data/inference/full_test_predictions.jsonl.",
+      "action": "Run inference on the complete Kaggle test dataset and save one JSONL row per test audio file."
+    },
+    {
+      "id": "real_model_checkpoint",
+      "label": "Real trained or fine-tuned checkpoint",
+      "status": "missing",
+      "required": true,
+      "detail": "Expected metadata: models/checkpoints/model-metadata.json.",
+      "action": "Add checkpoint metadata that points to the trained model artifact used for inference."
+    },
+    {
+      "id": "public_weights",
+      "label": "Public model weights/checkpoints",
+      "status": "missing",
+      "required": true,
+      "detail": "No public weights URL found.",
+      "action": "Publish model weights/checkpoints to GitHub Releases or Hugging Face and add public_weights_url."
+    },
+    {
+      "id": "model_size_limit",
+      "label": "Under 1B parameters",
+      "status": "missing",
+      "required": true,
+      "detail": "parameter_count=missing",
+      "action": "Record parameter_count in models/checkpoints/model-metadata.json."
+    },
+    {
+      "id": "edge_memory_limit",
+      "label": "Edge memory <= 8 GB",
+      "status": "missing",
+      "required": true,
+      "detail": "edge_memory_gb=missing",
+      "action": "Benchmark or estimate peak model memory and keep it at or below 8 GB."
+    },
+    {
+      "id": "hardware_latency_report",
+      "label": "Hardware latency report",
+      "status": "missing",
+      "required": true,
+      "detail": "Expected report: reports/hardware_latency_report.json; ram_gb=missing; mean_latency_ms=missing.",
+      "action": "Run the latency script on an edge device or edge-like machine and save reports/hardware_latency_report.json."
+    },
+    {
+      "id": "no_manual_test_correction",
+      "label": "No manual correction of test audio",
+      "status": "pass",
+      "required": true,
+      "detail": "Attestation file: docs/NO_MANUAL_TEST_CORRECTION_ATTESTATION.md.",
+      "action": "Keep the test-set prediction path fully automated and do not manually transcribe or correct test audio."
+    },
+    {
+      "id": "permissive_license",
+      "label": "Permissive open-source license",
+      "status": "pass",
+      "required": true,
+      "detail": "Repository license found: True; model license: missing.",
+      "action": "Use MIT, Apache-2.0, BSD-3-Clause, or MPL-2.0 and record the model license."
+    },
+    {
+      "id": "model_card",
+      "label": "Model/data card included",
+      "status": "missing",
+      "required": true,
+      "detail": "Expected model card: models/model_card.md.",
+      "action": "Create a model card covering languages, datasets, WER, limitations, intended use, and ethics."
+    },
+    {
+      "id": "training_logs",
+      "label": "Training logs and reproducibility artifacts",
+      "status": "missing",
+      "required": true,
+      "detail": "Expected logs: outputs/local_data/training/training_logs.jsonl.",
+      "action": "Save training logs, hardware specs, checkpoints, and reproducibility notes."
+    }
+  ]
+}

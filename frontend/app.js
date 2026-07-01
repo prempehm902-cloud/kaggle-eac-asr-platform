@@ -10,6 +10,10 @@ const refreshButton = document.querySelector("#refreshButton");
 const submissionButton = document.querySelector("#submissionButton");
 const submissionBox = document.querySelector("#submissionBox");
 const submissionBuilderForm = document.querySelector("#submissionBuilderForm");
+const competitionValidationButton = document.querySelector("#competitionValidationButton");
+const competitionValidationSummary = document.querySelector("#competitionValidationSummary");
+const competitionValidationGrid = document.querySelector("#competitionValidationGrid");
+const competitionValidationBox = document.querySelector("#competitionValidationBox");
 const feedbackForm = document.querySelector("#feedbackForm");
 const feedbackBox = document.querySelector("#feedbackBox");
 const batchForm = document.querySelector("#batchForm");
@@ -2716,6 +2720,41 @@ ${rows.map((row) => `${row.id}, ${row.language}, ${row.prediction}`).join("\n") 
 `;
 }
 
+function renderCompetitionValidation(result = {}) {
+  if (!competitionValidationBox) return;
+  const checks = result.checks || [];
+  const status = result.status || "unknown";
+  if (competitionValidationSummary) {
+    competitionValidationSummary.innerHTML = `
+      <strong class="validation-status ${status}">${status.toUpperCase()}</strong>
+      <span>${result.passed || 0} passed · ${result.failed || 0} required checks missing</span>
+    `;
+  }
+  if (competitionValidationGrid) {
+    competitionValidationGrid.innerHTML = checks.map((check) => `
+      <article class="readiness-card ${check.status === "pass" ? "ready" : "needs-review"}">
+        <span>${check.status}</span>
+        <strong>${check.label}</strong>
+        <p>${check.detail}</p>
+      </article>
+    `).join("");
+  }
+  competitionValidationBox.textContent = JSON.stringify({
+    status: result.status,
+    generated_at: result.generated_at,
+    submission_requirements: result.submission_requirements,
+    submission: result.submission,
+    report_paths: result.report_paths,
+    next_actions: checks.filter((check) => check.status !== "pass").map((check) => ({ check: check.label, action: check.action })),
+  }, null, 2);
+}
+
+async function loadCompetitionValidationStatus() {
+  if (!competitionValidationBox) return;
+  const response = await fetch("/api/v1/competition/validation/status");
+  renderCompetitionValidation(await response.json());
+}
+
 async function loadSettings() {
   if (!settingsRuntime) return;
   if (!getAuthToken()) {
@@ -2842,6 +2881,7 @@ async function refreshAll() {
     loadJobs(),
     loadEvaluations(),
     loadDeploymentReadiness(),
+    loadCompetitionValidationStatus(),
     loadWorkspaces(),
     loadSettings(),
     loadAuditLogs(),
@@ -3150,12 +3190,22 @@ async function createSubmission(payload = {}) {
 
 submissionButton.addEventListener("click", async () => {
   await createSubmission();
+  await loadCompetitionValidationStatus();
+});
+
+competitionValidationButton?.addEventListener("click", async () => {
+  competitionValidationBox.textContent = "Running competition validation...";
+  const response = await fetch("/api/v1/competition/validation/run", { method: "POST" });
+  const result = await response.json();
+  renderCompetitionValidation(result);
+  showToast(result.status === "ready" ? "Competition package is ready." : "Validation complete. Missing final artifacts are listed.");
 });
 
 submissionBuilderForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const payload = Object.fromEntries(new FormData(submissionBuilderForm).entries());
   await createSubmission(payload);
+  await loadCompetitionValidationStatus();
 });
 
 refreshButton?.addEventListener("click", refreshAll);

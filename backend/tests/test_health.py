@@ -131,3 +131,18 @@ def test_kaggle_submission_builder_creates_csv() -> None:
     assert set(payload["preview_rows"][0].keys()) == {"id", "language", "prediction"}
     assert payload["preview_rows"][0]["language"] in {"swa", "kik", "luo", "som", "mas", "kln"}
     assert payload["hardware_validation_report"]["latency_report_required"] is True
+
+
+def test_competition_validation_endpoint() -> None:
+    client = TestClient(app)
+    response = client.get("/api/v1/competition/validation/status")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["submission_requirements"]["required_columns"] == ["id", "language", "prediction"]
+    assert set(payload["submission_requirements"]["valid_language_codes"]) == {"swa", "kik", "luo", "som", "mas", "kln"}
+    assert any(check["id"] == "no_manual_test_correction" for check in payload["checks"])
+    assert any(check["id"] == "hardware_latency_report" for check in payload["checks"])
+
+    run = client.post("/api/v1/competition/validation/run")
+    assert run.status_code == 200
+    assert "report_paths" in run.json()
