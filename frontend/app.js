@@ -84,6 +84,8 @@ const userDropdown = document.querySelector("#userDropdown");
 const userInitials = document.querySelector("#userInitials");
 const userName = document.querySelector("#userName");
 const userEmail = document.querySelector("#userEmail");
+const publicShareUrl = document.querySelector("#publicShareUrl");
+const copyPublicUrlButton = document.querySelector("#copyPublicUrlButton");
 const signOutButton = document.querySelector("#signOutButton");
 const authOverlay = document.querySelector("#authOverlay");
 const authCloseButton = document.querySelector("#authCloseButton");
@@ -230,6 +232,7 @@ const createTypeConfig = {
   },
 };
 let activeWorkspaceId = localStorage.getItem("afrivoice-workspace-id") || "";
+const PUBLIC_PROJECT_URL = "https://kaggle-eac-asr-platform.onrender.com";
 
 const adapterAliases = {
   "faster-whisper": "faster_whisper",
@@ -382,6 +385,7 @@ function updateAuthToolbar() {
   if (signInButton) signInButton.hidden = signedIn;
   if (registerButton) registerButton.hidden = signedIn;
   if (userMenu) userMenu.hidden = !signedIn;
+  if (publicShareUrl) publicShareUrl.textContent = PUBLIC_PROJECT_URL;
   if (signedIn) {
     const displayName = user.name || user.email.split("@")[0];
     if (userInitials) userInitials.textContent = getInitials(displayName);
@@ -1840,6 +1844,16 @@ copyLocalUrlButton?.addEventListener("click", async () => {
   setTimeout(() => {
     copyLocalUrlButton.textContent = original;
   }, 1400);
+});
+
+copyPublicUrlButton?.addEventListener("click", async () => {
+  await navigator.clipboard.writeText(PUBLIC_PROJECT_URL);
+  const original = copyPublicUrlButton.textContent;
+  copyPublicUrlButton.textContent = "Copied public URL";
+  showToast("Public project URL copied. You can send it to your supervisor or team.");
+  setTimeout(() => {
+    copyPublicUrlButton.textContent = original;
+  }, 1600);
 });
 
 contributeButton?.addEventListener("click", () => {

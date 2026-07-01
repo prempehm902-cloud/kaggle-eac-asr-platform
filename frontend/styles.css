@@ -2940,7 +2940,7 @@ body:has(#navToggle:checked) .create-menu {
   right: 0;
   top: calc(100% + 10px);
   z-index: 20;
-  width: 240px;
+  width: 330px;
   padding: 12px;
   border: 1px solid #d9dee7;
   border-radius: 16px;
@@ -2961,6 +2961,39 @@ body:has(#navToggle:checked) .create-menu {
   background: #fff !important;
   color: #111827 !important;
   border-radius: 12px !important;
+}
+
+
+.public-share-card {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 10px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.public-share-card strong {
+  font-size: 0.82rem;
+  color: #111827;
+}
+
+.public-share-card code {
+  display: block;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background: #fff;
+  color: #111827;
+  border: 1px solid #d9dee7;
+  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+}
+
+.user-dropdown .public-share-card button {
+  background: #111827 !important;
+  color: #fff !important;
+  border-color: #111827 !important;
 }
 
 .auth-overlay {
@@ -5183,4 +5216,20 @@ body.dark-theme .created-tags span {
 
 .compact-quality .metric {
   min-height: 110px;
+}
+
+
+body.dark-theme .public-share-card {
+  background: #111827;
+  border-color: #334155;
+}
+
+body.dark-theme .public-share-card strong,
+body.dark-theme .public-share-card code {
+  color: #e5e7eb;
+}
+
+body.dark-theme .public-share-card code {
+  background: #0b1220;
+  border-color: #334155;
 }
