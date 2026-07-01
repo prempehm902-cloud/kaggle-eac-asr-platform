@@ -1837,13 +1837,13 @@ localStatusButton?.addEventListener("click", (event) => {
 });
 
 copyLocalUrlButton?.addEventListener("click", async () => {
-  const url = "http://127.0.0.1:8000";
-  await navigator.clipboard.writeText(url);
+  await navigator.clipboard.writeText(PUBLIC_PROJECT_URL);
   const original = copyLocalUrlButton.textContent;
-  copyLocalUrlButton.textContent = "Copied";
+  copyLocalUrlButton.textContent = "Copied public URL";
+  showToast("Public project URL copied. Share this link with your boss or teammates.");
   setTimeout(() => {
     copyLocalUrlButton.textContent = original;
-  }, 1400);
+  }, 1600);
 });
 
 copyPublicUrlButton?.addEventListener("click", async () => {
