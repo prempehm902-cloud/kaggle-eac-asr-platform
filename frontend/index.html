@@ -1218,7 +1218,7 @@ print(response.json())</pre>
             <div class="accordion">
               <details open>
                 <summary>Kaggle submission builder</summary>
-                <p>Select a model, generate predictions for the test dataset, validate the file shape, preview rows, and write a submission artifact.</p>
+                <p>Select a model, generate predictions for the test dataset, validate the exact Kaggle CSV shape, preview rows, and write a submission artifact.</p>
                 <form id="submissionBuilderForm" class="mini-form submission-builder-form">
                   <select name="model_name" aria-label="Submission model">
                     <option value="Fine-tuned AfriVoice">Fine-tuned AfriVoice</option>
@@ -1229,7 +1229,7 @@ print(response.json())</pre>
                   <input name="dataset_name" value="digitalumuganda/anv-test-data-nt" aria-label="Dataset name" />
                   <button class="primary" type="submit">Generate submission.csv</button>
                 </form>
-                <pre id="submissionBox" class="result compact">No submission job created yet.</pre>
+                <pre id="submissionBox" class="result compact">No submission job created yet. Required header: id,language,prediction. Language must be ISO 639-3: swa, kik, luo, som, mas, kln.</pre>
               </details>
               <details open>
                 <summary>Datasets</summary>

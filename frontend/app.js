@@ -2578,6 +2578,7 @@ async function loadDeploymentReadiness() {
 function renderSubmissionResult(result = {}) {
   if (!submissionBox) return;
   const rows = result.preview_rows || [];
+  const hardware = result.hardware_validation_report || {};
   submissionBox.innerHTML = `
 Submission ID: ${result.submission_id || "pending"}
 Status: ${result.status || "unknown"}
@@ -2586,11 +2587,21 @@ Adapter: ${result.adapter || selectedAsrModel}
 Dataset: ${result.dataset_name || "digitalumuganda/anv-test-data-nt"}
 Artifact: ${result.submission_path || "not generated"}
 
+Required CSV header:
+id,language,prediction
+
+Allowed language codes:
+swa=Swahili, kik=Kikuyu, luo=Luo/Dholuo, som=Somali, mas=Maasai, kln=Kalenjin
+
 Validation:
 ${JSON.stringify(result.validation || {}, null, 2)}
 
+Edge and hardware validation:
+${JSON.stringify(hardware, null, 2)}
+
 Preview:
-${rows.map((row) => `${row.audio_id}, ${row.language}, ${row.transcript}`).join("\\n") || "No preview rows returned."}
+id,language,prediction
+${rows.map((row) => `${row.id}, ${row.language}, ${row.prediction}`).join("\n") || "No preview rows returned."}
 `;
 }
 

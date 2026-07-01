@@ -108,9 +108,18 @@ def test_integration_endpoints() -> None:
 
 def test_kaggle_submission_builder_creates_csv() -> None:
     client = TestClient(app)
+    requirements = client.get("/api/v1/submissions/requirements")
+    assert requirements.status_code == 200
+    assert requirements.json()["required_columns"] == ["id", "language", "prediction"]
+
     response = client.post("/api/v1/submissions/kaggle", json={"sample_count": 3})
     assert response.status_code == 200
     payload = response.json()
+    assert payload["validation"]["required_columns"] == ["id", "language", "prediction"]
     assert payload["validation"]["ready_for_download"] is True
+    assert payload["validation"]["no_manual_test_transcription"] is True
     assert payload["submission_path"].endswith(".csv")
     assert len(payload["preview_rows"]) >= 2
+    assert set(payload["preview_rows"][0].keys()) == {"id", "language", "prediction"}
+    assert payload["preview_rows"][0]["language"] in {"swa", "kik", "luo", "som", "mas", "kln"}
+    assert payload["hardware_validation_report"]["latency_report_required"] is True

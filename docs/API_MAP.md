@@ -47,5 +47,6 @@
 
 ## Submission
 
+- `GET /api/v1/submissions/requirements`
 - `POST /api/v1/submissions/kaggle`
 

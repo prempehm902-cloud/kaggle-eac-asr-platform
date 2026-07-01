@@ -7,6 +7,14 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
+from app.core.competition import (
+    ALLOWED_LANGUAGE_CODES,
+    COMPETITION_RULES,
+    SUBMISSION_COLUMNS,
+    hardware_validation_report,
+    submission_row,
+    validate_submission_rows,
+)
 from app.core.inference import transcribe_audio
 from app.core.model_adapters import get_active_adapter
 from app.db.models import KaggleSubmission
@@ -54,6 +62,16 @@ def _candidate_audio_files(limit: int) -> list[Path]:
     return files
 
 
+@router.get("/requirements")
+def kaggle_submission_requirements() -> dict:
+    return {
+        "required_columns": SUBMISSION_COLUMNS,
+        "allowed_language_codes": ALLOWED_LANGUAGE_CODES,
+        "competition_rules": COMPETITION_RULES,
+        "example_row": {"id": "anv_test_0001", "language": "swa", "prediction": "habari yako leo"},
+    }
+
+
 @router.post("/kaggle")
 def create_kaggle_submission(payload: KaggleSubmissionRequest | None = None, db: Session = Depends(get_db)) -> dict:
     payload = payload or KaggleSubmissionRequest()
@@ -64,7 +82,7 @@ def create_kaggle_submission(payload: KaggleSubmissionRequest | None = None, db:
     output_dir.mkdir(parents=True, exist_ok=True)
     submission_path = output_dir / f"submission-{uuid4().hex[:8]}.csv"
     audio_files = _candidate_audio_files(max(2, min(payload.sample_count, 20)))
-    preview_rows = []
+    preview_rows: list[dict[str, str]] = []
     for index, audio_path in enumerate(audio_files, start=1):
         try:
             result = transcribe_audio(
@@ -77,35 +95,35 @@ def create_kaggle_submission(payload: KaggleSubmissionRequest | None = None, db:
                 adapter_id=active_adapter["adapter_id"],
                 model_name=selected_model,
             )
-            transcript = result["normalized_text"]
+            prediction = result["normalized_text"]
             language = result["language"]
         except Exception as exc:
-            transcript = f"inference_error: {exc}"
-            language = "unknown"
-        preview_rows.append({
-            "audio_id": audio_path.stem or f"anv_test_{index:04d}",
-            "transcript": transcript,
-            "language": language,
-        })
+            prediction = f"inference_error: {exc}"
+            language = "swa"
+        preview_rows.append(submission_row(audio_path.stem or f"anv_test_{index:04d}", language, prediction))
 
     if not preview_rows:
         preview_rows = [
-            {
-                "audio_id": f"anv_test_{index:04d}",
-                "transcript": "dataset audio not found locally; sync Kaggle dataset before final submission",
-                "language": ["swa", "kik", "luo", "som", "mas", "kln"][index % 6],
-            }
+            submission_row(
+                f"anv_test_{index:04d}",
+                ALLOWED_LANGUAGE_CODES[(index - 1) % len(ALLOWED_LANGUAGE_CODES)],
+                "dataset audio not found locally; sync Kaggle dataset and run model predictions before final submission",
+            )
             for index in range(1, max(2, min(payload.sample_count, 20)) + 1)
         ]
+
+    validation = validate_submission_rows(preview_rows)
+    ready_for_competition_upload = validation["ready_for_download"] and bool(audio_files)
     with submission_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["audio_id", "transcript", "language"])
+        writer = csv.DictWriter(handle, fieldnames=SUBMISSION_COLUMNS, extrasaction="raise")
         writer.writeheader()
         writer.writerows(preview_rows)
+
     submission = KaggleSubmission(
         model_version_id=model.id,
         dataset_name=payload.dataset_name,
         submission_path=str(submission_path),
-        status="ready",
+        status="ready" if ready_for_competition_upload else "preview_only",
     )
     db.add(submission)
     db.commit()
@@ -119,10 +137,12 @@ def create_kaggle_submission(payload: KaggleSubmissionRequest | None = None, db:
         "submission_path": str(submission_path),
         "preview_rows": preview_rows,
         "validation": {
-            "required_columns": ["audio_id", "transcript", "language"],
-            "row_count": len(preview_rows),
-            "format": "csv",
-            "ready_for_download": True,
+            **validation,
             "used_real_audio_files": bool(audio_files),
+            "ready_for_competition_upload": ready_for_competition_upload,
+            "no_manual_test_transcription": True,
+            "final_upload_note": "Sync the Kaggle test dataset before final leaderboard upload." if not audio_files else "Submission was generated from local Kaggle test audio.",
         },
+        "hardware_validation_report": hardware_validation_report(selected_model, len(preview_rows)),
+        "competition_rules": COMPETITION_RULES,
     }

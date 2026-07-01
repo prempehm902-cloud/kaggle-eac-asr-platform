@@ -77,6 +77,55 @@ The goal is to support real-world use cases such as field recordings, offline tr
 10. Check model quality, leaderboard, audit, and evaluation pages.
 11. Open the API documentation: https://kaggle-eac-asr-platform.onrender.com/docs
 
+
+## Kaggle Competition Requirements
+
+The project now validates the boss/organizer submission rules directly in the backend and UI.
+
+Final Kaggle submission files must be CSV files with exactly these three columns:
+
+```csv
+id,language,prediction
+```
+
+The `language` column must use ISO 639-3 codes only:
+
+| Language | Code |
+| --- | --- |
+| Swahili | `swa` |
+| Kikuyu | `kik` |
+| Luo / Dholuo | `luo` |
+| Somali | `som` |
+| Maasai | `mas` |
+| Kalenjin | `kln` |
+
+Important rules captured in this project:
+
+- Do not manually transcribe or human-correct Kaggle test audio.
+- A generated file is final-upload ready only after the Kaggle test dataset has been synced locally and predictions come from the ASR pipeline.
+- Team size must be 5 participants or fewer.
+- Use one leaderboard account per team.
+- Share your Kaggle username with the organizer to be added to the team.
+- Publish code, training scripts, checkpoints/weights, logs, hardware specs, and model/data cards publicly.
+- Use a permissive open-source license such as MIT, Apache-2.0, BSD-3-Clause, or MPL-2.0. This repository includes an MIT license.
+- Keep the model under 1 billion parameters.
+- Validate inference on edge hardware with 8 GB RAM or less and include latency for the full test set.
+- Cite external pretrained models and verify license compatibility.
+
+The strict submission route is:
+
+```text
+POST /api/v1/submissions/kaggle
+```
+
+The requirements endpoint is:
+
+```text
+GET /api/v1/submissions/requirements
+```
+
+See `docs/COMPETITION_COMPLIANCE.md` for the complete checklist.
+
 ## Tech Stack
 
 - Backend: FastAPI
@@ -205,4 +254,4 @@ This project was built for the AfriVoice East Africa ASR Hackathon, where the go
 
 ## License
 
-This project is for research, education, and hackathon demonstration purposes.
+This project is released under the MIT License. See `LICENSE`.
