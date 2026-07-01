@@ -3130,6 +3130,11 @@ body:has(#navToggle:checked) .create-menu {
   gap: 14px;
 }
 
+.auth-form[hidden],
+.auth-dialog [hidden] {
+  display: none !important;
+}
+
 .auth-form label {
   display: grid;
   gap: 8px;

@@ -489,8 +489,16 @@ function setAuthMode(mode) {
       ? "Create a workspace profile for transcripts, corrections, submissions, and model review."
       : "Access saved transcripts, submissions, model runs, and correction history.";
   }
-  if (signInForm) signInForm.hidden = isRegister;
-  if (registerForm) registerForm.hidden = !isRegister;
+  if (signInForm) {
+    signInForm.hidden = isRegister;
+    signInForm.setAttribute("aria-hidden", String(isRegister));
+    signInForm.querySelectorAll("input, button").forEach((field) => { field.disabled = isRegister; });
+  }
+  if (registerForm) {
+    registerForm.hidden = !isRegister;
+    registerForm.setAttribute("aria-hidden", String(!isRegister));
+    registerForm.querySelectorAll("input, button").forEach((field) => { field.disabled = !isRegister; });
+  }
   if (authSwitchButton) authSwitchButton.textContent = isRegister ? "Already have an account? Sign in" : "New here? Create an account";
   if (authMessage) {
     authMessage.textContent = "";
