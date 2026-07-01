@@ -46,3 +46,8 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 @app.get("/", include_in_schema=False)
 def web_app() -> FileResponse:
     return FileResponse(static_dir / "index.html")
+
+
+@app.get("/@{username}", include_in_schema=False)
+def public_profile(username: str) -> FileResponse:
+    return FileResponse(static_dir / "index.html")

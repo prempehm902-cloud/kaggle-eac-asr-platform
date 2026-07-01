@@ -85,7 +85,17 @@ const userInitials = document.querySelector("#userInitials");
 const userName = document.querySelector("#userName");
 const userEmail = document.querySelector("#userEmail");
 const publicShareUrl = document.querySelector("#publicShareUrl");
+const profileShareUrl = document.querySelector("#profileShareUrl");
 const copyPublicUrlButton = document.querySelector("#copyPublicUrlButton");
+const copyProfileUrlButton = document.querySelector("#copyProfileUrlButton");
+const viewProfileLink = document.querySelector("#viewProfileLink");
+const profileDisplayName = document.querySelector("#profileDisplayName");
+const profileDisplayLead = document.querySelector("#profileDisplayLead");
+const profileDisplayUrl = document.querySelector("#profileDisplayUrl");
+const copyProfileDisplayUrlButton = document.querySelector("#copyProfileDisplayUrlButton");
+const profileRecordCount = document.querySelector("#profileRecordCount");
+const profileReviewCount = document.querySelector("#profileReviewCount");
+const profileModelChoice = document.querySelector("#profileModelChoice");
 const signOutButton = document.querySelector("#signOutButton");
 const authOverlay = document.querySelector("#authOverlay");
 const authCloseButton = document.querySelector("#authCloseButton");
@@ -327,6 +337,53 @@ function getAuthToken() {
   return localStorage.getItem("afrivoice-token") || "";
 }
 
+function slugifyUsername(value = "") {
+  const slug = String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+  return slug || "asr-user";
+}
+
+function getUserSlug(user = getStoredUser()) {
+  if (!user) return "asr-user";
+  return slugifyUsername(user.username || user.name || String(user.email || "").split("@")[0]);
+}
+
+function getUserProfileUrl(user = getStoredUser()) {
+  return `${PUBLIC_PROJECT_URL}/@${getUserSlug(user)}`;
+}
+
+function renderProfileView(user = getStoredUser(), routeSlug = "") {
+  const slug = routeSlug || getUserSlug(user);
+  const profileUrl = `${PUBLIC_PROJECT_URL}/@${slug}`;
+  const displayName = user?.name || (routeSlug ? routeSlug.replace(/-/g, " ") : "Kaggle ASR user");
+  const reviewCount = speechRecords.filter((record) => Number(record.confidence || 0) < 0.72).length;
+  if (profileDisplayName) profileDisplayName.textContent = displayName;
+  if (profileDisplayLead) {
+    profileDisplayLead.textContent = user?.email
+      ? `${user.email} · Public ASR workspace profile for speech records, review work, model runs, and Kaggle submission progress.`
+      : "Public ASR workspace profile for speech records, review work, model runs, and Kaggle submission progress.";
+  }
+  if (profileDisplayUrl) profileDisplayUrl.textContent = profileUrl;
+  if (profileRecordCount) profileRecordCount.textContent = String(speechRecords.length);
+  if (profileReviewCount) profileReviewCount.textContent = String(reviewCount);
+  if (profileModelChoice) profileModelChoice.textContent = selectedAsrModel;
+  return profileUrl;
+}
+
+function updateProfileLinks() {
+  const user = getStoredUser();
+  const profileUrl = getUserProfileUrl(user);
+  if (profileShareUrl) profileShareUrl.textContent = profileUrl;
+  if (viewProfileLink) viewProfileLink.href = `/@${getUserSlug(user)}`;
+  renderProfileView(user);
+}
+
 function authHeaders(extra = {}) {
   const token = getAuthToken();
   return token ? { ...extra, Authorization: `Bearer ${token}` } : extra;
@@ -386,6 +443,7 @@ function updateAuthToolbar() {
   if (registerButton) registerButton.hidden = signedIn;
   if (userMenu) userMenu.hidden = !signedIn;
   if (publicShareUrl) publicShareUrl.textContent = PUBLIC_PROJECT_URL;
+  updateProfileLinks();
   if (signedIn) {
     const displayName = user.name || user.email.split("@")[0];
     if (userInitials) userInitials.textContent = getInitials(displayName);
@@ -1560,7 +1618,19 @@ function openFooterTarget(panel, action = "") {
   }
 }
 
+function openProfileFromPath() {
+  const match = window.location.pathname.match(/^\/@([a-z0-9-]+)\/?$/i);
+  if (!match) return false;
+  const slug = slugifyUsername(match[1]);
+  renderProfileView(getStoredUser(), slug);
+  showPanel("profile");
+  syncNavigation("profile");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  return true;
+}
+
 function openPanelFromHash() {
+  if (openProfileFromPath()) return true;
   const panel = window.location.hash.replace("#", "");
   if (!panel || !document.getElementById(panel)) return false;
   showPanel(panel);
@@ -1844,6 +1914,25 @@ copyLocalUrlButton?.addEventListener("click", async () => {
   setTimeout(() => {
     copyLocalUrlButton.textContent = original;
   }, 1600);
+});
+
+async function copyUserProfileUrl(button) {
+  const profileUrl = getUserProfileUrl();
+  await navigator.clipboard.writeText(profileUrl);
+  const original = button.textContent;
+  button.textContent = "Copied profile URL";
+  showToast("Public profile URL copied. This link includes your signed-in username.");
+  setTimeout(() => {
+    button.textContent = original;
+  }, 1600);
+}
+
+copyProfileUrlButton?.addEventListener("click", async () => {
+  await copyUserProfileUrl(copyProfileUrlButton);
+});
+
+copyProfileDisplayUrlButton?.addEventListener("click", async () => {
+  await copyUserProfileUrl(copyProfileDisplayUrlButton);
 });
 
 copyPublicUrlButton?.addEventListener("click", async () => {

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AfriVoice EAC ASR Console</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260622-more-clean" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260701-profile-url" />
   </head>
   <body>
     <svg aria-hidden="true" class="icon-sprite">
@@ -163,9 +163,17 @@
               <div id="userDropdown" class="user-dropdown" hidden>
                 <span id="userEmail">Signed in</span>
                 <div class="public-share-card">
+                  <strong>Your public profile URL</strong>
+                  <code id="profileShareUrl">https://kaggle-eac-asr-platform.onrender.com/@user</code>
+                  <div class="share-card-actions">
+                    <button id="copyProfileUrlButton" type="button">Copy profile URL</button>
+                    <a id="viewProfileLink" href="/@user">View profile</a>
+                  </div>
+                </div>
+                <div class="public-share-card subtle-share-card">
                   <strong>Public project URL</strong>
                   <code id="publicShareUrl">https://kaggle-eac-asr-platform.onrender.com</code>
-                  <button id="copyPublicUrlButton" type="button">Copy public URL</button>
+                  <button id="copyPublicUrlButton" type="button">Copy project URL</button>
                 </div>
                 <button id="signOutButton" type="button">Sign out</button>
               </div>
@@ -1200,6 +1208,29 @@ print(response.json())</pre>
             </div>
           </section>
 
+          <section class="panel" id="profile">
+            <div class="destination-page profile-destination">
+              <p class="destination-kicker">Public Profile</p>
+              <h1 id="profileDisplayName">Kaggle ASR user</h1>
+              <p id="profileDisplayLead" class="destination-lead">A public workspace profile for sharing ASR records, submissions, model runs, and review progress.</p>
+              <div class="profile-url-card">
+                <span>Profile URL</span>
+                <code id="profileDisplayUrl">https://kaggle-eac-asr-platform.onrender.com/@user</code>
+                <button id="copyProfileDisplayUrlButton" class="primary" type="button">Copy profile URL</button>
+              </div>
+              <div class="profile-summary-grid">
+                <article><strong id="profileRecordCount">0</strong><span>Saved speech records</span></article>
+                <article><strong id="profileReviewCount">0</strong><span>Items needing review</span></article>
+                <article><strong id="profileModelChoice">mock</strong><span>Selected ASR model</span></article>
+              </div>
+              <div class="destination-actions">
+                <button class="secondary-action" type="button" data-jump="transcribe">Record speech</button>
+                <button class="secondary-action" type="button" data-jump="history">Open speech library</button>
+                <button class="secondary-action" type="button" data-jump="metadata">Build submission</button>
+              </div>
+            </div>
+          </section>
+
           <section class="panel" id="support">
             <div class="section-head">
               <h2>More</h2>
@@ -1503,6 +1534,6 @@ print(response.json())</pre>
     </aside>
     <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="/static/app.js?v=20260619-production-platform"></script>
+    <script src="/static/app.js?v=20260701-profile-url"></script>
   </body>
 </html>

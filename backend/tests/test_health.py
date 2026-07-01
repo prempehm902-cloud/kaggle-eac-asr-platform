@@ -19,6 +19,14 @@ def test_homepage() -> None:
     assert "Transcript History" in response.text
 
 
+def test_public_profile_route() -> None:
+    client = TestClient(app)
+    response = client.get("/@michael-owusu-prempeh")
+    assert response.status_code == 200
+    assert "Your public profile URL" in response.text
+    assert "Public Profile" in response.text
+
+
 def test_lab_endpoints() -> None:
     client = TestClient(app)
 
