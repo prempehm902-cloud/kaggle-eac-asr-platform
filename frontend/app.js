@@ -2745,6 +2745,8 @@ function renderCompetitionValidation(result = {}) {
     submission_requirements: result.submission_requirements,
     submission: result.submission,
     report_paths: result.report_paths,
+    competition_rules: result.competition_rules,
+    dataset_summary: result.dataset_summary,
     next_actions: checks.filter((check) => check.status !== "pass").map((check) => ({ check: check.label, action: check.action })),
   }, null, 2);
 }

@@ -142,6 +142,10 @@ def test_competition_validation_endpoint() -> None:
     assert set(payload["submission_requirements"]["valid_language_codes"]) == {"swa", "kik", "luo", "som", "mas", "kln"}
     assert any(check["id"] == "no_manual_test_correction" for check in payload["checks"])
     assert any(check["id"] == "hardware_latency_report" for check in payload["checks"])
+    assert any(check["id"] == "team_and_leaderboard_policy" for check in payload["checks"])
+    assert any(check["id"] == "third_party_license_review" for check in payload["checks"])
+    assert payload["competition_rules"]["team_size_limit"] == 5
+    assert payload["dataset_summary"]["languages"][0]["iso_code"] == "swa"
 
     run = client.post("/api/v1/competition/validation/run")
     assert run.status_code == 200

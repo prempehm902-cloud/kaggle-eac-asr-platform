@@ -16,6 +16,11 @@ The validator checks the supervisor and Kaggle requirements:
 - edge memory is at or below 8 GB
 - real hardware latency report exists at `reports/hardware_latency_report.json`
 - no manual correction of test audio is documented
+- team size and one-leaderboard-account policy are documented
+- permissive open-source release checklist is present
+- third-party/pretrained model licenses are reviewed
+- dataset card/source references accompany the final package
+- competition terms acknowledgement is present
 - permissive open-source license is present
 - model card and training logs are included
 

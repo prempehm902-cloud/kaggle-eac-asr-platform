@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-01T16:56:10.074508+00:00",
+  "generated_at": "2026-07-02T07:52:17.911540+00:00",
   "status": "blocked",
-  "passed": 3,
+  "passed": 8,
   "failed": 8,
   "submission_requirements": {
     "required_columns": [
@@ -20,9 +20,89 @@
     "language_column_rule": "Use 3-letter ISO 639-3 codes only, never full language names.",
     "no_manual_test_audio_correction": true
   },
+  "competition_rules": {
+    "submission_columns": [
+      "id",
+      "language",
+      "prediction"
+    ],
+    "language_column": "Use ISO 639-3 codes only: swa, kik, luo, som, mas, kln.",
+    "team_size_limit": 5,
+    "leaderboard_accounts": "One leaderboard account per team.",
+    "test_audio_policy": "No manual transcription or human correction of test audio.",
+    "open_source_license": "Publish code, training scripts, checkpoints, weights, model cards, and data cards under MIT, Apache-2.0, BSD-3-Clause, MPL-2.0, or another OSI-approved permissive license.",
+    "technical_report": "Top 5 teams must provide a short technical report; track winners must publish a detailed blog post or workshop paper.",
+    "reproducibility_artifacts": "Organizers may request training logs, checkpoints, hardware specs, and reproducibility evidence.",
+    "external_models": "External pretrained models are allowed only when properly cited and license-compatible.",
+    "external_tools": "External tools/data must be publicly accessible, free or minimal cost, and reasonably available to all participants.",
+    "model_size_limit": "Under 1 billion parameters total.",
+    "edge_memory_limit": "Must run inference on edge devices with 8 GB RAM or less.",
+    "hardware_report": "Include test-set inference latency and hardware specifications.",
+    "governing_law": "Unless otherwise specified, competition rules are governed by the laws of Rwanda."
+  },
+  "dataset_summary": {
+    "source": "AfriVoices East Africa dataset",
+    "license": "CC BY 4.0 for Kaggle test dataset package as documented by the data page",
+    "languages": [
+      {
+        "language": "Swahili",
+        "iso_code": "swa",
+        "dialects": "Swahili-English Nairobi/Kisii/Wajir/Mombasa/Nakuru; Swahili Tanzania Dar-es-Salaam",
+        "read_hours": 0,
+        "spontaneous_hours": 2979,
+        "total_hours": 2979
+      },
+      {
+        "language": "Kikuyu",
+        "iso_code": "kik",
+        "dialects": "Gi-Kabete, Ki-Mathira, Ki-Muranga, Ki-Ndia, Gi-Gichugu",
+        "read_hours": 183,
+        "spontaneous_hours": 571,
+        "total_hours": 754
+      },
+      {
+        "language": "Luo / Dholuo",
+        "iso_code": "luo",
+        "dialects": "Nyandwat, Milambo",
+        "read_hours": 195,
+        "spontaneous_hours": 528,
+        "total_hours": 723
+      },
+      {
+        "language": "Somali",
+        "iso_code": "som",
+        "dialects": "Maxatire, Mogadishu",
+        "read_hours": 118,
+        "spontaneous_hours": 884,
+        "total_hours": 1002
+      },
+      {
+        "language": "Kalenjin",
+        "iso_code": "kln",
+        "dialects": "Nandi, Kipsigis",
+        "read_hours": 122,
+        "spontaneous_hours": 399,
+        "total_hours": 521
+      },
+      {
+        "language": "Maasai",
+        "iso_code": "mas",
+        "dialects": "Kimasaai, Kisamburu",
+        "read_hours": 51,
+        "spontaneous_hours": 454,
+        "total_hours": 505
+      }
+    ],
+    "repositories": [
+      "DigitalUmuganda/Afrivoice_Swahili",
+      "MCAA1-MSU/anv_data_ke",
+      "DigitalUmuganda/Afrivoice",
+      "digitalumuganda/anv-test-data-nt"
+    ]
+  },
   "submission": {
     "exists": true,
-    "path": "outputs/local_data/submissions/submission-4c0cee8e.csv",
+    "path": "outputs/local_data/submissions/submission-38f26f7d.csv",
     "row_count": 3,
     "valid": true,
     "violations": []
@@ -33,7 +113,7 @@
       "label": "Kaggle CSV format",
       "status": "pass",
       "required": true,
-      "detail": "Latest CSV: outputs/local_data/submissions/submission-4c0cee8e.csv; rows: 3; violations: 0.",
+      "detail": "Latest CSV: outputs/local_data/submissions/submission-38f26f7d.csv; rows: 3; violations: 0.",
       "action": "Generate a submission from Metadata > Kaggle submission builder. Header must be id,language,prediction."
     },
     {
@@ -93,6 +173,30 @@
       "action": "Keep the test-set prediction path fully automated and do not manually transcribe or correct test audio."
     },
     {
+      "id": "team_and_leaderboard_policy",
+      "label": "Team and leaderboard policy",
+      "status": "pass",
+      "required": true,
+      "detail": "Attestation file: docs/TEAM_AND_LEADERBOARD_ATTESTATION.md.",
+      "action": "Keep team size at 5 or fewer participants and use one leaderboard account per team."
+    },
+    {
+      "id": "open_source_release_checklist",
+      "label": "Open-source release checklist",
+      "status": "pass",
+      "required": true,
+      "detail": "Checklist file: docs/OPEN_SOURCE_RELEASE_CHECKLIST.md.",
+      "action": "Publish code, training scripts, checkpoints, weights, model cards, and data cards under an OSI-approved permissive license."
+    },
+    {
+      "id": "third_party_license_review",
+      "label": "Third-party license review",
+      "status": "pass",
+      "required": true,
+      "detail": "License review file: docs/THIRD_PARTY_LICENSES.md.",
+      "action": "Document pretrained models, dependencies, external tools, external data, and any incompatible licenses."
+    },
+    {
       "id": "permissive_license",
       "label": "Permissive open-source license",
       "status": "pass",
@@ -102,11 +206,27 @@
     },
     {
       "id": "model_card",
-      "label": "Model/data card included",
+      "label": "Model card included",
       "status": "missing",
       "required": true,
       "detail": "Expected model card: models/model_card.md.",
       "action": "Create a model card covering languages, datasets, WER, limitations, intended use, and ethics."
+    },
+    {
+      "id": "dataset_card",
+      "label": "Dataset card included",
+      "status": "pass",
+      "required": true,
+      "detail": "Dataset card file: docs/DATASET_DESCRIPTION.md.",
+      "action": "Include the organizer-provided dataset card and source repository references with the final submission."
+    },
+    {
+      "id": "competition_terms_acknowledgement",
+      "label": "Competition terms acknowledgement",
+      "status": "pass",
+      "required": true,
+      "detail": "Terms acknowledgement: docs/COMPETITION_TERMS_ACKNOWLEDGEMENT.md.",
+      "action": "Document acceptance of competition-specific rules and Kaggle foundational rules."
     },
     {
       "id": "training_logs",

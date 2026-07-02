@@ -34,10 +34,15 @@ COMPETITION_RULES = {
     "team_size_limit": 5,
     "leaderboard_accounts": "One leaderboard account per team.",
     "test_audio_policy": "No manual transcription or human correction of test audio.",
-    "open_source_license": "Publish code, training scripts, checkpoints, and model cards under MIT, Apache-2.0, BSD-3-Clause, or MPL-2.0.",
+    "open_source_license": "Publish code, training scripts, checkpoints, weights, model cards, and data cards under MIT, Apache-2.0, BSD-3-Clause, MPL-2.0, or another OSI-approved permissive license.",
+    "technical_report": "Top 5 teams must provide a short technical report; track winners must publish a detailed blog post or workshop paper.",
+    "reproducibility_artifacts": "Organizers may request training logs, checkpoints, hardware specs, and reproducibility evidence.",
+    "external_models": "External pretrained models are allowed only when properly cited and license-compatible.",
+    "external_tools": "External tools/data must be publicly accessible, free or minimal cost, and reasonably available to all participants.",
     "model_size_limit": "Under 1 billion parameters total.",
     "edge_memory_limit": "Must run inference on edge devices with 8 GB RAM or less.",
     "hardware_report": "Include test-set inference latency and hardware specifications.",
+    "governing_law": "Unless otherwise specified, competition rules are governed by the laws of Rwanda.",
 }
 
 

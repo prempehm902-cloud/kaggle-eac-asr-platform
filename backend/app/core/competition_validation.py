@@ -4,10 +4,29 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from app.core.competition import ALLOWED_LANGUAGE_CODES, SUBMISSION_COLUMNS
+from app.core.competition import ALLOWED_LANGUAGE_CODES, COMPETITION_RULES, SUBMISSION_COLUMNS
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 PERMISSIVE_LICENSES = {"mit", "apache-2.0", "bsd-3-clause", "mpl-2.0"}
+
+AFRIVOICES_DATASET_SUMMARY = {
+    "source": "AfriVoices East Africa dataset",
+    "license": "CC BY 4.0 for Kaggle test dataset package as documented by the data page",
+    "languages": [
+        {"language": "Swahili", "iso_code": "swa", "dialects": "Swahili-English Nairobi/Kisii/Wajir/Mombasa/Nakuru; Swahili Tanzania Dar-es-Salaam", "read_hours": 0, "spontaneous_hours": 2979, "total_hours": 2979},
+        {"language": "Kikuyu", "iso_code": "kik", "dialects": "Gi-Kabete, Ki-Mathira, Ki-Muranga, Ki-Ndia, Gi-Gichugu", "read_hours": 183, "spontaneous_hours": 571, "total_hours": 754},
+        {"language": "Luo / Dholuo", "iso_code": "luo", "dialects": "Nyandwat, Milambo", "read_hours": 195, "spontaneous_hours": 528, "total_hours": 723},
+        {"language": "Somali", "iso_code": "som", "dialects": "Maxatire, Mogadishu", "read_hours": 118, "spontaneous_hours": 884, "total_hours": 1002},
+        {"language": "Kalenjin", "iso_code": "kln", "dialects": "Nandi, Kipsigis", "read_hours": 122, "spontaneous_hours": 399, "total_hours": 521},
+        {"language": "Maasai", "iso_code": "mas", "dialects": "Kimasaai, Kisamburu", "read_hours": 51, "spontaneous_hours": 454, "total_hours": 505},
+    ],
+    "repositories": [
+        "DigitalUmuganda/Afrivoice_Swahili",
+        "MCAA1-MSU/anv_data_ke",
+        "DigitalUmuganda/Afrivoice",
+        "digitalumuganda/anv-test-data-nt",
+    ],
+}
 
 
 def _utc_now() -> str:
@@ -104,6 +123,11 @@ def collect_competition_validation() -> dict[str, Any]:
     model_card_path = PROJECT_ROOT / "models" / "model_card.md"
     training_logs_path = PROJECT_ROOT / "outputs" / "local_data" / "training" / "training_logs.jsonl"
     no_manual_policy_path = PROJECT_ROOT / "docs" / "NO_MANUAL_TEST_CORRECTION_ATTESTATION.md"
+    team_policy_path = PROJECT_ROOT / "docs" / "TEAM_AND_LEADERBOARD_ATTESTATION.md"
+    release_checklist_path = PROJECT_ROOT / "docs" / "OPEN_SOURCE_RELEASE_CHECKLIST.md"
+    third_party_license_path = PROJECT_ROOT / "docs" / "THIRD_PARTY_LICENSES.md"
+    dataset_card_path = PROJECT_ROOT / "docs" / "DATASET_DESCRIPTION.md"
+    terms_ack_path = PROJECT_ROOT / "docs" / "COMPETITION_TERMS_ACKNOWLEDGEMENT.md"
     license_path = PROJECT_ROOT / "LICENSE"
 
     parameter_count = int(_number(model_metadata.get("parameter_count")))
@@ -171,6 +195,27 @@ def collect_competition_validation() -> dict[str, Any]:
             "Keep the test-set prediction path fully automated and do not manually transcribe or correct test audio.",
         ),
         _check(
+            "team_and_leaderboard_policy",
+            "Team and leaderboard policy",
+            team_policy_path.exists(),
+            f"Attestation file: {_relative(team_policy_path)}.",
+            "Keep team size at 5 or fewer participants and use one leaderboard account per team.",
+        ),
+        _check(
+            "open_source_release_checklist",
+            "Open-source release checklist",
+            release_checklist_path.exists(),
+            f"Checklist file: {_relative(release_checklist_path)}.",
+            "Publish code, training scripts, checkpoints, weights, model cards, and data cards under an OSI-approved permissive license.",
+        ),
+        _check(
+            "third_party_license_review",
+            "Third-party license review",
+            third_party_license_path.exists(),
+            f"License review file: {_relative(third_party_license_path)}.",
+            "Document pretrained models, dependencies, external tools, external data, and any incompatible licenses.",
+        ),
+        _check(
             "permissive_license",
             "Permissive open-source license",
             license_path.exists() and (model_license in PERMISSIVE_LICENSES or license_path.read_text(encoding="utf-8", errors="ignore").lower().startswith("mit")),
@@ -179,10 +224,24 @@ def collect_competition_validation() -> dict[str, Any]:
         ),
         _check(
             "model_card",
-            "Model/data card included",
+            "Model card included",
             model_card_path.exists(),
             f"Expected model card: {_relative(model_card_path)}.",
             "Create a model card covering languages, datasets, WER, limitations, intended use, and ethics.",
+        ),
+        _check(
+            "dataset_card",
+            "Dataset card included",
+            dataset_card_path.exists(),
+            f"Dataset card file: {_relative(dataset_card_path)}.",
+            "Include the organizer-provided dataset card and source repository references with the final submission.",
+        ),
+        _check(
+            "competition_terms_acknowledgement",
+            "Competition terms acknowledgement",
+            terms_ack_path.exists(),
+            f"Terms acknowledgement: {_relative(terms_ack_path)}.",
+            "Document acceptance of competition-specific rules and Kaggle foundational rules.",
         ),
         _check(
             "training_logs",
@@ -204,6 +263,8 @@ def collect_competition_validation() -> dict[str, Any]:
             "language_column_rule": "Use 3-letter ISO 639-3 codes only, never full language names.",
             "no_manual_test_audio_correction": True,
         },
+        "competition_rules": COMPETITION_RULES,
+        "dataset_summary": AFRIVOICES_DATASET_SUMMARY,
         "submission": submission,
         "checks": checks,
     }
@@ -228,6 +289,17 @@ def write_competition_validation_reports() -> dict[str, Any]:
         "",
         "CSV header must be exactly: `id,language,prediction`.",
         "Language values must be ISO 639-3 codes: `swa`, `kik`, `luo`, `som`, `mas`, `kln`.",
+        "",
+        "## Competition Rules Summary",
+        "",
+        "- Team size must be 5 or fewer participants.",
+        "- Use one leaderboard account per team.",
+        "- Do not manually transcribe or correct test audio.",
+        "- Publish code, training scripts, checkpoints, weights, model cards, and data cards under a permissive open-source license.",
+        "- External pretrained models/tools/data must be public, reasonably available, and license-compatible.",
+        "- Model must be under 1B parameters and capable of edge inference with 8 GB RAM or less.",
+        "- Include hardware latency for the full test set.",
+        "- Competition rules are governed by Rwanda law unless otherwise specified.",
         "",
         "## Checks",
         "",

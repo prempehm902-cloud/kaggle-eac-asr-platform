@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AfriVoice EAC ASR Console</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260701-competition-validation" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260702-rules-validation" />
   </head>
   <body>
     <svg aria-hidden="true" class="icon-sprite">
@@ -1269,14 +1269,14 @@ print(response.json())</pre>
               </details>
               <details open>
                 <summary>Competition final validation</summary>
-                <p>Run the supervisor checklist for exact CSV format, ISO language codes, real checkpoint evidence, full test inference, public weights, edge latency, and no manual test correction.</p>
+                <p>Run the supervisor checklist for exact CSV format, ISO language codes, hackathon rules, open-source licensing, external model/tool review, dataset cards, real checkpoint evidence, full test inference, public weights, edge latency, and no manual test correction.</p>
                 <div class="validation-actions">
                   <button id="competitionValidationButton" class="primary" type="button">Run final validation</button>
                   <a class="docs-link" href="/docs#/competition-validation">Open validation API</a>
                 </div>
                 <div id="competitionValidationSummary" class="validation-summary">Validation has not run yet.</div>
                 <div id="competitionValidationGrid" class="readiness-grid compact-grid"></div>
-                <pre id="competitionValidationBox" class="result compact">Required artifacts: real model checkpoint metadata, full Kaggle test predictions, public weights URL, hardware latency report, model card, training logs, and no-manual-correction attestation.</pre>
+                <pre id="competitionValidationBox" class="result compact">Required artifacts: real model checkpoint metadata, full Kaggle test predictions, public weights URL, hardware latency report, model card, dataset card, training logs, team/leaderboard attestation, third-party license review, terms acknowledgement, and no-manual-correction attestation.</pre>
               </details>
               <details open>
                 <summary>Datasets</summary>
@@ -1545,6 +1545,6 @@ print(response.json())</pre>
     </aside>
     <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="/static/app.js?v=20260701-competition-validation"></script>
+    <script src="/static/app.js?v=20260702-rules-validation"></script>
   </body>
 </html>
