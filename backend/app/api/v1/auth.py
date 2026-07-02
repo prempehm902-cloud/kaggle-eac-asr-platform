@@ -41,7 +41,7 @@ def _token(user: User) -> str:
         "sub": user.id,
         "email": user.email,
         "role": user.role,
-        "exp": (utc_now() + timedelta(hours=12)).isoformat(),
+        "exp": (utc_now() + timedelta(days=7)).isoformat(),
     }
     raw = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
     sig = hmac.new(secret.encode(), raw.encode(), "sha256").hexdigest()
@@ -62,7 +62,10 @@ def current_user(authorization: str | None = Header(default=None), db: Session =
             raise ValueError("expired")
     except Exception as exc:
         raise HTTPException(status_code=401, detail="Invalid or expired token") from exc
-    return db.get(User, payload["sub"])
+    user = db.get(User, payload["sub"])
+    if not user:
+        raise HTTPException(status_code=401, detail="User session no longer exists. Please sign in again.")
+    return user
 
 
 def require_user(user: User | None = Depends(current_user)) -> User:
@@ -110,8 +113,17 @@ def _user_response(user: User, token: str | None = None, db: Session | None = No
 @router.post("/register")
 def register(payload: AuthPayload, db: Session = Depends(get_db)) -> dict:
     email = payload.email.strip().lower()
-    if db.query(User).filter(User.email == email).first():
-        raise HTTPException(status_code=409, detail="Email is already registered")
+    existing_user = db.query(User).filter(User.email == email).first()
+    if existing_user:
+        if not verify_password(payload.password, existing_user.password_hash):
+            raise HTTPException(status_code=409, detail="Email is already registered. Please sign in with the original password.")
+        if not existing_user.password_hash.startswith("bcrypt$"):
+            existing_user.password_hash = hash_password(payload.password)
+        log_audit(db, action="auth.register_existing_login", user=existing_user, entity_type="user", entity_id=existing_user.id)
+        db.commit()
+        response = _user_response(existing_user, _token(existing_user), db)
+        response["status"] = "signed_in_existing_account"
+        return response
     user = User(
         name=payload.name or email.split("@")[0],
         email=email,
@@ -123,7 +135,9 @@ def register(payload: AuthPayload, db: Session = Depends(get_db)) -> dict:
     log_audit(db, action="auth.register", user=user, entity_type="user", entity_id=user.id)
     db.commit()
     db.refresh(user)
-    return _user_response(user, _token(user), db)
+    response = _user_response(user, _token(user), db)
+    response["status"] = "registered"
+    return response
 
 
 @router.post("/login")

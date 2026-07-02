@@ -341,6 +341,19 @@ function getAuthToken() {
   return localStorage.getItem("afrivoice-token") || "";
 }
 
+function clearUserSession({ silent = false } = {}) {
+  localStorage.removeItem("afrivoice-user");
+  localStorage.removeItem("afrivoice-token");
+  localStorage.removeItem("afrivoice-workspace-id");
+  activeWorkspaceId = "";
+  if (userDropdown) userDropdown.hidden = true;
+  userMenuButton?.setAttribute("aria-expanded", "false");
+  updateAuthToolbar();
+  renderWorkspaceOptions([]);
+  if (!silent) showToast("Signed out of this workspace.");
+}
+
+
 function slugifyUsername(value = "") {
   const slug = String(value || "")
     .trim()
@@ -395,7 +408,12 @@ function authHeaders(extra = {}) {
 
 async function apiFetch(url, options = {}) {
   const headers = authHeaders(options.headers || {});
-  return fetch(url, { ...options, headers });
+  const response = await fetch(url, { ...options, headers });
+  if (response.status === 401 && getAuthToken()) {
+    clearUserSession({ silent: true });
+    showToast("Your session expired. Please sign in again.", "error");
+  }
+  return response;
 }
 
 function showToast(message, type = "success") {
@@ -545,7 +563,45 @@ function saveUserSession(user) {
   renderWorkspaceOptions(user.workspaces || []);
   saveWorkspaceState();
   closeAuth();
-  showToast(`Signed in as ${user.email}`);
+  showToast(user.status === "signed_in_existing_account" ? `Welcome back, ${user.email}` : `Signed in as ${user.email}`);
+}
+
+async function restoreUserSession() {
+  const token = getAuthToken();
+  if (!token) {
+    updateAuthToolbar();
+    return null;
+  }
+  try {
+    const response = await fetch("/api/v1/auth/me", { headers: authHeaders() });
+    if (!response.ok) {
+      clearUserSession({ silent: true });
+      return null;
+    }
+    const user = await response.json();
+    const existing = getStoredUser() || {};
+    localStorage.setItem("afrivoice-user", JSON.stringify({ ...existing, ...user, restoredAt: new Date().toISOString() }));
+    if (user.active_workspace_id) {
+      activeWorkspaceId = user.active_workspace_id;
+      localStorage.setItem("afrivoice-workspace-id", activeWorkspaceId);
+    }
+    updateAuthToolbar();
+    renderWorkspaceOptions(user.workspaces || []);
+    return user;
+  } catch {
+    updateAuthToolbar();
+    return getStoredUser();
+  }
+}
+
+function setAuthFormBusy(form, busy, label) {
+  if (!form) return;
+  const submit = form.querySelector('button[type="submit"]');
+  if (submit) {
+    if (!submit.dataset.defaultLabel) submit.dataset.defaultLabel = submit.textContent || label;
+    submit.textContent = busy ? label : submit.dataset.defaultLabel;
+  }
+  form.querySelectorAll("input, button").forEach((field) => { field.disabled = busy; });
 }
 
 function getTranscriptText(result = {}) {
@@ -1698,18 +1754,26 @@ signInForm?.addEventListener("submit", async (event) => {
     showAuthMessage("Enter a valid email and a password with at least 6 characters.", "error");
     return;
   }
-  const response = await fetch("/api/v1/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!response.ok) {
-    showAuthMessage((await response.json()).detail || "Sign in failed.", "error");
-    showToast("Sign in failed. Check your email and password.", "error");
-    return;
+  setAuthFormBusy(signInForm, true, "Signing in...");
+  try {
+    const response = await fetch("/api/v1/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      showAuthMessage((await response.json()).detail || "Sign in failed.", "error");
+      showToast("Sign in failed. Check your email and password.", "error");
+      return;
+    }
+    saveUserSession(await response.json());
+    await Promise.all([loadWorkspaces(), loadHistory(), loadJobs(), loadEvaluations(), loadDeploymentReadiness(), loadSettings(), loadAuditLogs()]);
+  } catch (error) {
+    showAuthMessage(`Could not reach the sign-in service: ${error.message}`, "error");
+    showToast("Sign in service is unavailable right now.", "error");
+  } finally {
+    setAuthMode(authMode);
   }
-  saveUserSession(await response.json());
-  await Promise.all([loadWorkspaces(), loadHistory(), loadJobs(), loadEvaluations(), loadDeploymentReadiness(), loadSettings(), loadAuditLogs()]);
 });
 
 registerForm?.addEventListener("submit", async (event) => {
@@ -1723,18 +1787,26 @@ registerForm?.addEventListener("submit", async (event) => {
     showAuthMessage("Complete all fields and use a password with at least 6 characters.", "error");
     return;
   }
-  const response = await fetch("/api/v1/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: `${firstName} ${lastName}`, email, password, role: "Reviewer" }),
-  });
-  if (!response.ok) {
-    showAuthMessage((await response.json()).detail || "Registration failed.", "error");
-    showToast("Registration failed. Try another email.", "error");
-    return;
+  setAuthFormBusy(registerForm, true, "Creating account...");
+  try {
+    const response = await fetch("/api/v1/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: `${firstName} ${lastName}`, email, password, role: "Reviewer" }),
+    });
+    if (!response.ok) {
+      showAuthMessage((await response.json()).detail || "Registration failed.", "error");
+      showToast("Registration failed. Try another email or sign in.", "error");
+      return;
+    }
+    saveUserSession(await response.json());
+    await Promise.all([loadWorkspaces(), loadHistory(), loadJobs(), loadEvaluations(), loadDeploymentReadiness(), loadSettings(), loadAuditLogs()]);
+  } catch (error) {
+    showAuthMessage(`Could not reach the registration service: ${error.message}`, "error");
+    showToast("Registration service is unavailable right now.", "error");
+  } finally {
+    setAuthMode(authMode);
   }
-  saveUserSession(await response.json());
-  await Promise.all([loadWorkspaces(), loadHistory(), loadJobs(), loadEvaluations(), loadDeploymentReadiness(), loadSettings(), loadAuditLogs()]);
 });
 
 userMenuButton?.addEventListener("click", () => {
@@ -1744,15 +1816,7 @@ userMenuButton?.addEventListener("click", () => {
 });
 
 signOutButton?.addEventListener("click", () => {
-  localStorage.removeItem("afrivoice-user");
-  localStorage.removeItem("afrivoice-token");
-  localStorage.removeItem("afrivoice-workspace-id");
-  activeWorkspaceId = "";
-  if (userDropdown) userDropdown.hidden = true;
-  userMenuButton?.setAttribute("aria-expanded", "false");
-  updateAuthToolbar();
-  renderWorkspaceOptions([]);
-  showToast("Signed out of this workspace.");
+  clearUserSession();
 });
 
 workspaceSwitcher?.addEventListener("change", async () => {
@@ -3232,7 +3296,9 @@ if (downloadButton) {
   });
 }
 
-updateAuthToolbar();
+restoreUserSession().then(() => {
+  loadWorkspaces();
+});
 renderUploadProgress("Ready");
 updateMicrophonePermissionState();
 if (asrModelSwitcher) asrModelSwitcher.value = selectedAsrModel;

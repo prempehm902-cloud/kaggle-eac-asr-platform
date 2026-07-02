@@ -29,6 +29,24 @@ def test_auth_returns_token_and_default_workspaces() -> None:
     assert me.json()["email"] == user["email"]
 
 
+def test_register_existing_email_with_same_password_returns_session() -> None:
+    client = TestClient(app)
+    email = f"repeat-{time()}@example.com"
+    payload = {"name": "Repeat User", "email": email, "password": "password123", "role": "Reviewer"}
+
+    first = client.post("/api/v1/auth/register", json=payload)
+    assert first.status_code == 200
+    second = client.post("/api/v1/auth/register", json=payload)
+    assert second.status_code == 200
+    second_payload = second.json()
+    assert second_payload["status"] == "signed_in_existing_account"
+    assert second_payload["email"] == email
+    assert second_payload["access_token"]
+
+    wrong_password = client.post("/api/v1/auth/register", json={**payload, "password": "wrong-password"})
+    assert wrong_password.status_code == 409
+
+
 def test_workspace_owned_transcription_can_replay_and_delete() -> None:
     client = TestClient(app)
     user, headers = _register(client, "Reviewer")
