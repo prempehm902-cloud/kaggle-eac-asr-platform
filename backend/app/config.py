@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_result_backend: str = "redis://localhost:6379/1"
     kaggle_dataset_id: str = "digitalumuganda/anv-test-data-nt"
-    local_kaggle_dataset_path: Path = Path("/Users/michaelprempeh/Downloads/anv-test-data-nt (2)")
+    local_kaggle_dataset_path: Path = Path("data/raw/kaggle/anv-test-data-nt/afri-voices-east-africa-asr-hackathon.zip")
     hf_datasets: str = "DigitalUmuganda/Afrivoice_Swahili,MCAA1-MSU/anv_data_ke,DigitalUmuganda/Afrivoice"
     tts_backend: str = "local_wave"
     tts_output_dir: Path = Path("outputs/local_data/tts")

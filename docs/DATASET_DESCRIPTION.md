@@ -28,3 +28,13 @@ print("Path to dataset files:", path)
 ```
 
 The Kaggle test package is documented as CC BY 4.0. Preserve dataset attribution in model cards, reports, and final submission artifacts.
+
+## Local Imported Package
+
+A local Kaggle package has been copied into the repository at:
+
+```text
+data/raw/kaggle/anv-test-data-nt/afri-voices-east-africa-asr-hackathon.zip
+```
+
+The current package is validated by the dataset integration endpoint before it is used for manifests or final submission. If the package contains a Google reCAPTCHA/challenge HTML file instead of audio, the dashboard will mark it as `blocked_download_html` and require a Kaggle-authenticated `kagglehub` download before final inference.

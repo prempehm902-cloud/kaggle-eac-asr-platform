@@ -1,5 +1,6 @@
 import json
 import math
+import zipfile
 import wave
 from datetime import UTC, datetime
 from pathlib import Path
@@ -66,23 +67,26 @@ class EvaluationReportRequest(BaseModel):
     include_latency: bool = True
 
 
-def _local_dataset_summary(path: Path) -> dict:
-    exists = path.exists()
-    summary: dict = {
+def _expected_tree() -> dict:
+    return {
+        "kik": ["Scripted", "Unscripted"],
+        "kln": ["Scripted", "Unscripted"],
+        "luo": ["Scripted", "Unscripted"],
+        "mas": ["Scripted", "Unscripted"],
+        "som": ["Scripted", "Unscripted"],
+        "swa": ["Scripted", "Unscripted"],
+    }
+
+
+def _base_dataset_summary(path: Path) -> dict:
+    return {
         "provided_path": str(path),
-        "exists": exists,
+        "exists": path.exists(),
         "dataset_id": get_settings().kaggle_dataset_id,
         "kagglehub_code": f'path = kagglehub.dataset_download("{get_settings().kaggle_dataset_id}")',
         "print_line": f"Path to dataset files: {path}",
         "languages": EAC_LANGUAGES,
-        "expected_tree": {
-            "kik": ["Scripted", "Unscripted"],
-            "kln": ["Scripted", "Unscripted"],
-            "luo": ["Scripted", "Unscripted"],
-            "mas": ["Scripted", "Unscripted"],
-            "som": ["Scripted", "Unscripted"],
-            "swa": ["Scripted", "Unscripted"],
-        },
+        "expected_tree": _expected_tree(),
         "actions": [
             {"label": "Sync Kaggle dataset", "panel": "integrations", "action": "kaggle_sync"},
             {"label": "Open data explorer", "panel": "explorer", "action": "inspect_local_dataset"},
@@ -90,8 +94,79 @@ def _local_dataset_summary(path: Path) -> dict:
             {"label": "Build Kaggle submission", "panel": "metadata", "action": "submission_builder"},
         ],
     }
-    if not exists:
-        summary["note"] = "The provided local file was not found. Use the KaggleHub sync button to download the latest dataset."
+
+
+def _looks_like_blocked_html(sample: str) -> bool:
+    normalized = sample.lower()
+    return "<html" in normalized and ("recaptcha" in normalized or "challengepage" in normalized or "google.com/recaptcha" in normalized)
+
+
+def _zip_dataset_summary(path: Path, summary: dict) -> dict:
+    try:
+        with zipfile.ZipFile(path) as archive:
+            members = [item for item in archive.infolist() if not item.is_dir()]
+            names = [item.filename for item in members]
+            sample_text = ""
+            blocked_members = []
+            for item in members[:5]:
+                try:
+                    raw = archive.read(item, pwd=None)[:2000]
+                except RuntimeError:
+                    continue
+                text_sample = raw.decode("utf-8", errors="ignore")
+                if not sample_text:
+                    sample_text = text_sample[:800]
+                if _looks_like_blocked_html(text_sample):
+                    blocked_members.append(item.filename)
+            audio_extensions = {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".webm"}
+            metadata_extensions = {".csv", ".json", ".jsonl", ".tsv", ".txt", ".parquet"}
+            audio_count = sum(1 for name in names if Path(name).suffix.lower() in audio_extensions)
+            metadata_count = sum(1 for name in names if Path(name).suffix.lower() in metadata_extensions)
+            detected_languages = sorted({part for name in names for part in Path(name).parts if part in _expected_tree()})
+            real_dataset = audio_count > 0 or len(detected_languages) >= 2
+            status = "ready_for_manifest" if real_dataset and not blocked_members else "blocked_download_html" if blocked_members else "archive_needs_review"
+            note = (
+                "The zip contains a Google reCAPTCHA/challenge HTML file, not the real Kaggle audio dataset. Re-download with Kaggle credentials or kagglehub, then import again."
+                if blocked_members
+                else "Zip archive was imported. It is ready for manifesting once audio files and language folders are present."
+                if real_dataset
+                else "Zip archive was imported, but no audio files or expected language folders were detected. Verify the Kaggle download before final inference."
+            )
+            summary.update({
+                "kind": "zip_archive",
+                "status": status,
+                "file_count": len(members),
+                "directory_count": len({str(Path(name).parent) for name in names if str(Path(name).parent) != "."}),
+                "audio_file_count": audio_count,
+                "metadata_file_count": metadata_count,
+                "detected_languages": detected_languages,
+                "sample_files": names[:20],
+                "blocked_html_members": blocked_members,
+                "sample": sample_text,
+                "ready_for_submission": real_dataset and not blocked_members,
+                "note": note,
+            })
+            return summary
+    except zipfile.BadZipFile:
+        summary.update({
+            "kind": "invalid_zip",
+            "status": "invalid_archive",
+            "file_count": 1,
+            "directory_count": 0,
+            "ready_for_submission": False,
+            "note": "The provided file has a .zip name but could not be opened as a zip archive.",
+        })
+        return summary
+
+
+def _local_dataset_summary(path: Path) -> dict:
+    summary = _base_dataset_summary(path)
+    if not path.exists():
+        summary.update({
+            "status": "missing_local_file",
+            "ready_for_submission": False,
+            "note": "The provided local file was not found. Use the KaggleHub sync button to download the latest dataset.",
+        })
         return summary
 
     summary["size_bytes"] = path.stat().st_size
@@ -99,28 +174,37 @@ def _local_dataset_summary(path: Path) -> dict:
     if path.is_dir():
         files = [entry for entry in path.rglob("*") if entry.is_file()]
         directories = [entry for entry in path.rglob("*") if entry.is_dir()]
-        summary.update(
-            {
-                "kind": "directory",
-                "file_count": len(files),
-                "directory_count": len(directories),
-                "sample_files": [str(item.relative_to(path)) for item in files[:12]],
-            }
-        )
+        audio_extensions = {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".webm"}
+        detected_languages = sorted({item.relative_to(path).parts[0] for item in files if item.relative_to(path).parts and item.relative_to(path).parts[0] in _expected_tree()})
+        audio_count = sum(1 for item in files if item.suffix.lower() in audio_extensions)
+        summary.update({
+            "kind": "directory",
+            "status": "ready_for_manifest" if audio_count else "directory_needs_review",
+            "file_count": len(files),
+            "directory_count": len(directories),
+            "audio_file_count": audio_count,
+            "detected_languages": detected_languages,
+            "sample_files": [str(item.relative_to(path)) for item in files[:12]],
+            "ready_for_submission": audio_count > 0,
+        })
         return summary
 
-    suffix = path.suffix.lower()
-    kind = "html_document" if suffix in {".html", ".htm", ""} else suffix.removeprefix(".")
+    if path.suffix.lower() == ".zip":
+        return _zip_dataset_summary(path, summary)
+
     sample = path.read_text(errors="ignore")[:800]
-    summary.update(
-        {
-            "kind": kind or "file",
-            "file_count": 1,
-            "directory_count": 0,
-            "sample": sample,
-            "note": "The attached item is a small HTML/download page, not the full Kaggle dataset directory. The app is wired to sync the real dataset with KaggleHub when credentials are available.",
-        }
-    )
+    blocked = _looks_like_blocked_html(sample)
+    suffix = path.suffix.lower()
+    kind = "html_document" if suffix in {".html", ".htm", ""} or blocked else suffix.removeprefix(".")
+    summary.update({
+        "kind": kind or "file",
+        "status": "blocked_download_html" if blocked else "single_file_needs_review",
+        "file_count": 1,
+        "directory_count": 0,
+        "sample": sample,
+        "ready_for_submission": False,
+        "note": "The attached item is a small HTML/download challenge page, not the full Kaggle dataset directory. Use KaggleHub with credentials to download the real dataset." if blocked else "Single file imported; verify it contains usable Kaggle data before final inference.",
+    })
     return summary
 
 
@@ -148,7 +232,23 @@ def _write_local_manifest(dataset_path: Path, manifest_path: Path, source: str) 
                 "relative_path": str(rel),
                 "language": language,
                 "size_bytes": item.stat().st_size,
+                "artifact_type": "audio" if item.suffix.lower() in {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".webm"} else "metadata",
             })
+    elif dataset_path.exists() and dataset_path.suffix.lower() == ".zip":
+        with zipfile.ZipFile(dataset_path) as archive:
+            for item in archive.infolist():
+                if item.is_dir():
+                    continue
+                rel = Path(item.filename)
+                language = next((part for part in rel.parts if part in _expected_tree()), "unknown")
+                rows.append({
+                    "source": source,
+                    "archive_path": str(dataset_path),
+                    "relative_path": item.filename,
+                    "language": language,
+                    "size_bytes": item.file_size,
+                    "artifact_type": "audio" if rel.suffix.lower() in {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".webm"} else "metadata",
+                })
     elif dataset_path.exists():
         rows.append({
             "source": source,
@@ -156,6 +256,7 @@ def _write_local_manifest(dataset_path: Path, manifest_path: Path, source: str) 
             "relative_path": dataset_path.name,
             "language": "unknown",
             "size_bytes": dataset_path.stat().st_size,
+            "artifact_type": "metadata",
         })
 
     with manifest_path.open("w", encoding="utf-8") as handle:
@@ -217,6 +318,8 @@ def dataset_sync_status() -> dict:
     local_summary = _local_dataset_summary(dataset_path)
     file_count = int(local_summary.get("file_count") or 0)
     exists = bool(local_summary.get("exists"))
+    ready = bool(local_summary.get("ready_for_submission"))
+    dataset_status = local_summary.get("status", "pending_sync")
     last_sync = None
     if exists:
         last_sync = datetime.fromtimestamp(dataset_path.stat().st_mtime, UTC).isoformat()
@@ -224,20 +327,22 @@ def dataset_sync_status() -> dict:
     for language in EAC_LANGUAGES:
         language_rows.append({
             **language,
-            "downloaded_files": 0 if not exists else max(1, file_count // len(EAC_LANGUAGES)),
-            "missing_transcripts": 0 if exists and file_count > 6 else 3,
+            "downloaded_files": 0 if not ready else max(1, file_count // len(EAC_LANGUAGES)),
+            "missing_transcripts": 0 if ready and file_count > 6 else 3,
             "corrupt_audio": 0,
-            "coverage": "ready" if exists else "pending_sync",
+            "coverage": "ready" if ready else dataset_status,
         })
     return {
-        "status": "local_dataset_found" if exists else "needs_sync",
+        "status": "local_dataset_ready" if ready else local_summary.get("status", "needs_sync"),
         "last_sync_at": last_sync,
         "kaggle": {
             "dataset_id": get_settings().kaggle_dataset_id,
             "path": str(dataset_path),
             "downloaded_files": file_count,
             "manifest_target": "data/manifests/kaggle-test.jsonl",
-            "ready_for_submission": exists,
+            "ready_for_submission": ready,
+            "validation_status": local_summary.get("status"),
+            "note": local_summary.get("note"),
         },
         "huggingface": {
             "datasets": [
@@ -262,12 +367,13 @@ def import_local_kaggle_dataset() -> dict:
     dataset_path = _dataset_path()
     summary = _local_dataset_summary(dataset_path)
     manifest = _write_local_manifest(dataset_path, _manifest_path("kaggle-test.jsonl"), "local-kaggle")
+    status = "manifest_created" if summary.get("ready_for_submission") else summary.get("status", "missing_local_file")
     return {
-        "status": "manifest_created" if summary["exists"] else "missing_local_file",
+        "status": status,
         "manifest_target": manifest["manifest_path"],
         "manifest_rows": manifest["row_count"],
         "dataset": summary,
-        "next_step": "Use KaggleHub sync for the full dataset, then rerun the dataset audit and submission builder.",
+        "next_step": "Use KaggleHub sync with Kaggle credentials for the full audio dataset, then rerun the dataset audit and submission builder." if not summary.get("ready_for_submission") else "Run the dataset audit, then generate full-test predictions and submission.csv.",
     }
 
 

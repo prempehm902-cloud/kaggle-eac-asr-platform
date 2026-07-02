@@ -85,6 +85,16 @@ def test_integration_endpoints() -> None:
     assert adapters.status_code == 200
     assert any(item["id"] == "faster_whisper" for item in adapters.json()["adapters"])
 
+    local_dataset = client.get("/api/v1/integrations/datasets/local/anv-test-data")
+    assert local_dataset.status_code == 200
+    assert local_dataset.json()["dataset_id"] == "digitalumuganda/anv-test-data-nt"
+    assert "ready_for_submission" in local_dataset.json()
+
+    imported = client.post("/api/v1/integrations/datasets/local/anv-test-data/import")
+    assert imported.status_code == 200
+    assert imported.json()["status"] in {"manifest_created", "blocked_download_html", "archive_needs_review", "missing_local_file"}
+    assert "manifest_target" in imported.json()
+
     kaggle = client.post(
         "/api/v1/integrations/datasets/kaggle/sync",
         json={"source": "kaggle", "dataset_id": "digitalumuganda/anv-test-data-nt"},
