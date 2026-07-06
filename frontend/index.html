@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AfriVoice EAC ASR Console</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260702-rules-validation" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260706-submit-modal-click-fix" />
   </head>
   <body>
     <svg aria-hidden="true" class="icon-sprite">
@@ -214,9 +214,9 @@
           </p>
           <div class="hero-actions">
             <button class="primary" data-jump="transcribe">Record audio</button>
-            <button id="submitPredictionButton" class="submit-prediction-button" type="button">Submit Prediction</button>
+            <button id="submitPredictionButton" class="submit-prediction-button" type="button" onclick="window.KaggleSubmissionControls?.openDialog?.(event)">Submit Prediction</button>
             <div class="submission-actions-menu-wrap">
-              <button id="submitPredictionMoreButton" class="submission-more-button" type="button" aria-label="More submission options" aria-expanded="false" aria-controls="submissionMoreMenu">•••</button>
+              <button id="submitPredictionMoreButton" class="submission-more-button" type="button" aria-label="More submission options" aria-expanded="false" aria-controls="submissionMoreMenu" onclick="window.KaggleSubmissionControls?.toggleMenu?.(event)">•••</button>
               <div id="submissionMoreMenu" class="submission-more-menu" role="menu" hidden>
                 <button type="button" role="menuitem" data-submission-action="collection">
                   <span aria-hidden="true">▣</span>
@@ -1635,6 +1635,6 @@ print(response.json())</pre>
     <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 
     <script src="/static/app.js?v=20260702-rules-validation"></script>
-    <script src="/static/submission-controls.js?v=20260706-clickable-submit"></script>
+    <script src="/static/submission-controls.js?v=20260706-submit-modal-click-fix"></script>
   </body>
 </html>

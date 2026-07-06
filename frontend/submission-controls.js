@@ -8,8 +8,8 @@
   };
 
   ready(() => {
-    if (document.body.dataset.submissionControlsWired) return;
-    document.body.dataset.submissionControlsWired = "standalone";
+    if (document.body.dataset.standaloneSubmissionControlsWired) return;
+    document.body.dataset.standaloneSubmissionControlsWired = "true";
 
     const submitButton = document.querySelector("#submitPredictionButton");
     const moreButton = document.querySelector("#submitPredictionMoreButton");
@@ -47,7 +47,10 @@
       moreButton.setAttribute("aria-expanded", "false");
     };
 
-    const openDialog = () => {
+    const openDialog = (event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
       if (!overlay) return;
       closeMenu();
       overlay.hidden = false;
@@ -56,10 +59,30 @@
       window.setTimeout(() => fileInput?.focus(), 40);
     };
 
-    const closeDialog = () => {
+    const closeDialog = (event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
       if (!overlay) return;
       overlay.hidden = true;
       document.body.classList.remove("modal-open");
+    };
+
+    const toggleMenu = (event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      if (!moreMenu || !moreButton) return;
+      const willOpen = moreMenu.hidden;
+      moreMenu.hidden = !willOpen;
+      moreButton.setAttribute("aria-expanded", String(willOpen));
+    };
+
+    window.KaggleSubmissionControls = {
+      openDialog,
+      closeDialog,
+      toggleMenu,
+      closeMenu,
     };
 
     function switchTab(tabName = "file") {
@@ -161,16 +184,9 @@ ${warnings}
       history.pushState({ panel: panelId }, "", `#${panelId}`);
     };
 
-    submitButton?.addEventListener("click", openDialog);
+    submitButton?.addEventListener("click", openDialog, true);
 
-    moreButton?.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (!moreMenu) return;
-      const willOpen = moreMenu.hidden;
-      moreMenu.hidden = !willOpen;
-      moreButton.setAttribute("aria-expanded", String(willOpen));
-    });
+    moreButton?.addEventListener("click", toggleMenu, true);
 
     moreMenu?.addEventListener("click", (event) => {
       const actionButton = event.target.closest("[data-submission-action]");

@@ -248,13 +248,20 @@ textarea {
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
 }
 
+#submissionMoreMenu[hidden],
 .submission-more-menu[hidden] {
-  display: none;
+  display: none !important;
 }
 
+#submissionMoreMenu:not([hidden]),
+.submission-more-menu:not([hidden]) {
+  display: block !important;
+}
+
+#submissionMoreMenu button,
 .submission-more-menu button {
   width: 100%;
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 18px;
   border: 0;
