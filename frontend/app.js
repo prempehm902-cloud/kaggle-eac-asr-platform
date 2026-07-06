@@ -10,6 +10,23 @@ const refreshButton = document.querySelector("#refreshButton");
 const submissionButton = document.querySelector("#submissionButton");
 const submissionBox = document.querySelector("#submissionBox");
 const submissionBuilderForm = document.querySelector("#submissionBuilderForm");
+const submitPredictionButton = document.querySelector("#submitPredictionButton");
+const submitPredictionMoreButton = document.querySelector("#submitPredictionMoreButton");
+const submissionOverlay = document.querySelector("#submissionOverlay");
+const submissionCloseButton = document.querySelector("#submissionCloseButton");
+const submissionCancelButton = document.querySelector("#submissionCancelButton");
+const submissionUploadForm = document.querySelector("#submissionUploadForm");
+const submissionFileInput = document.querySelector("#submissionFileInput");
+const submissionBrowseButton = document.querySelector("#submissionBrowseButton");
+const submissionDropzone = document.querySelector("#submissionDropzone");
+const submissionSelectedFile = document.querySelector("#submissionSelectedFile");
+const submissionDescription = document.querySelector("#submissionDescription");
+const submissionDescriptionCount = document.querySelector("#submissionDescriptionCount");
+const submissionValidateButton = document.querySelector("#submissionValidateButton");
+const submissionUploadResult = document.querySelector("#submissionUploadResult");
+const copySubmissionCliButton = document.querySelector("#copySubmissionCliButton");
+const submissionTabs = document.querySelectorAll(".submission-tab");
+const submissionPanels = document.querySelectorAll(".submission-tab-panel");
 const competitionValidationButton = document.querySelector("#competitionValidationButton");
 const competitionValidationSummary = document.querySelector("#competitionValidationSummary");
 const competitionValidationGrid = document.querySelector("#competitionValidationGrid");
@@ -1647,9 +1664,146 @@ document.querySelectorAll("[data-jump]").forEach((button) => {
       createMenu.hidden = true;
       createMenuButton.setAttribute("aria-expanded", "false");
     }
+    if (submissionOverlay && !submissionOverlay.hidden) closeSubmissionDialog();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 });
+
+let selectedSubmissionFile = null;
+
+function switchSubmissionTab(tabName = "file") {
+  submissionTabs.forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.submissionTab === tabName);
+  });
+  submissionPanels.forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.submissionPanel === tabName);
+  });
+}
+
+function openSubmissionDialog() {
+  if (!submissionOverlay) return;
+  submissionOverlay.hidden = false;
+  document.body.classList.add("modal-open");
+  switchSubmissionTab("file");
+  submissionFileInput?.focus();
+}
+
+function closeSubmissionDialog() {
+  if (!submissionOverlay) return;
+  submissionOverlay.hidden = true;
+  document.body.classList.remove("modal-open");
+}
+
+function setSubmissionFile(file) {
+  selectedSubmissionFile = file || null;
+  if (submissionValidateButton) submissionValidateButton.disabled = !selectedSubmissionFile;
+  if (!submissionSelectedFile) return;
+  if (!selectedSubmissionFile) {
+    submissionSelectedFile.hidden = true;
+    submissionSelectedFile.textContent = "";
+    return;
+  }
+  const sizeMb = selectedSubmissionFile.size / (1024 * 1024);
+  submissionSelectedFile.hidden = false;
+  submissionSelectedFile.innerHTML = `
+    <strong>${selectedSubmissionFile.name}</strong>
+    <span>${sizeMb >= 1 ? `${sizeMb.toFixed(1)} MB` : `${Math.max(1, Math.round(selectedSubmissionFile.size / 1024))} KB`}</span>
+  `;
+  if (submissionUploadResult) {
+    submissionUploadResult.textContent = "File selected. Click Validate file to check the header, rows, language codes, duplicates, and empty values.";
+  }
+}
+
+function renderSubmissionUploadResult(result = {}) {
+  if (!submissionUploadResult) return;
+  const status = result.ready_for_kaggle ? "READY FOR KAGGLE" : "NEEDS FIXES";
+  const errors = (result.errors || []).map((item) => `- ${item}`).join("\n") || "- No blocking errors";
+  const warnings = (result.warnings || []).map((item) => `- ${item}`).join("\n") || "- No warnings";
+  submissionUploadResult.textContent = `
+${status}
+
+File: ${result.file_name || result.filename || selectedSubmissionFile?.name || "unknown"}
+Stored copy: ${result.stored_path || "not stored"}
+Rows checked: ${result.row_count ?? "unknown"} / ${result.expected_rows ?? "41733"}
+Required columns: ${(result.required_columns || ["id", "language", "transcription"]).join(",")}
+
+Errors:
+${errors}
+
+Warnings:
+${warnings}
+`.trim();
+}
+
+async function validateSubmissionUpload(event) {
+  event.preventDefault();
+  if (!selectedSubmissionFile || !submissionUploadForm) {
+    showToast("Choose a submission file first.", "error");
+    return;
+  }
+  if (submissionUploadResult) submissionUploadResult.textContent = "Validating submission file...";
+  if (submissionValidateButton) submissionValidateButton.disabled = true;
+  const formData = new FormData();
+  formData.append("file", selectedSubmissionFile);
+  formData.append("description", submissionDescription?.value || "");
+  try {
+    const response = await fetch("/api/v1/submissions/validate-upload", {
+      method: "POST",
+      body: formData,
+    });
+    const result = await response.json();
+    renderSubmissionUploadResult(result);
+    showToast(result.ready_for_kaggle ? "Submission file is ready for Kaggle." : "Submission file needs fixes before upload.", result.ready_for_kaggle ? "success" : "error");
+  } catch (error) {
+    if (submissionUploadResult) submissionUploadResult.textContent = `Validation failed: ${error.message}`;
+    showToast("Submission validation failed.", "error");
+  } finally {
+    if (submissionValidateButton) submissionValidateButton.disabled = !selectedSubmissionFile;
+  }
+}
+
+submitPredictionButton?.addEventListener("click", openSubmissionDialog);
+submitPredictionMoreButton?.addEventListener("click", openSubmissionDialog);
+submissionCloseButton?.addEventListener("click", closeSubmissionDialog);
+submissionCancelButton?.addEventListener("click", closeSubmissionDialog);
+submissionOverlay?.addEventListener("click", (event) => {
+  if (event.target === submissionOverlay) closeSubmissionDialog();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && submissionOverlay && !submissionOverlay.hidden) closeSubmissionDialog();
+});
+submissionTabs.forEach((tab) => {
+  tab.addEventListener("click", () => switchSubmissionTab(tab.dataset.submissionTab));
+});
+submissionBrowseButton?.addEventListener("click", () => submissionFileInput?.click());
+submissionDropzone?.addEventListener("click", () => submissionFileInput?.click());
+submissionDropzone?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    submissionFileInput?.click();
+  }
+});
+submissionFileInput?.addEventListener("change", () => setSubmissionFile(submissionFileInput.files?.[0]));
+submissionDropzone?.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  submissionDropzone.classList.add("dragging");
+});
+submissionDropzone?.addEventListener("dragleave", () => submissionDropzone.classList.remove("dragging"));
+submissionDropzone?.addEventListener("drop", (event) => {
+  event.preventDefault();
+  submissionDropzone.classList.remove("dragging");
+  const file = event.dataTransfer?.files?.[0];
+  if (file) setSubmissionFile(file);
+});
+submissionDescription?.addEventListener("input", () => {
+  if (submissionDescriptionCount) submissionDescriptionCount.textContent = String(submissionDescription.value.length);
+});
+copySubmissionCliButton?.addEventListener("click", async () => {
+  const command = 'kaggle competitions submit -c afri-voices-east-africa-asr-hackathon -f final_competition_submission_transcription.csv -m "Automated ASR submission"';
+  await navigator.clipboard?.writeText(command);
+  showToast("Kaggle CLI command copied.");
+});
+submissionUploadForm?.addEventListener("submit", validateSubmissionUpload);
 
 async function inspectLocalDataset() {
   if (!localDatasetBox) return;
@@ -2767,7 +2921,7 @@ Dataset: ${result.dataset_name || "digitalumuganda/anv-test-data-nt"}
 Artifact: ${result.submission_path || "not generated"}
 
 Required CSV header:
-id,language,prediction
+id,language,transcription
 
 Allowed language codes:
 swa=Swahili, kik=Kikuyu, luo=Luo/Dholuo, som=Somali, mas=Maasai, kln=Kalenjin
@@ -2779,8 +2933,8 @@ Edge and hardware validation:
 ${JSON.stringify(hardware, null, 2)}
 
 Preview:
-id,language,prediction
-${rows.map((row) => `${row.id}, ${row.language}, ${row.prediction}`).join("\n") || "No preview rows returned."}
+id,language,transcription
+${rows.map((row) => `${row.id}, ${row.language}, ${row.transcription || row.prediction || ""}`).join("\n") || "No preview rows returned."}
 `;
 }
 

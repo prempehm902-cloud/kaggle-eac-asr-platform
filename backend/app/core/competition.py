@@ -25,7 +25,7 @@ CANONICAL_LANGUAGE_LABELS = {
     "kln": "Kalenjin",
 }
 
-SUBMISSION_COLUMNS = ["id", "language", "prediction"]
+SUBMISSION_COLUMNS = ["id", "language", "transcription"]
 ALLOWED_LANGUAGE_CODES = list(CANONICAL_LANGUAGE_LABELS.keys())
 
 COMPETITION_RULES = {
@@ -51,11 +51,11 @@ def normalize_language_code(value: str | None, fallback: str = "swa") -> str:
     return LANGUAGE_CODES.get(key, fallback)
 
 
-def submission_row(sample_id: str, language: str | None, prediction: str | None) -> dict[str, str]:
+def submission_row(sample_id: str, language: str | None, transcription: str | None) -> dict[str, str]:
     return {
         "id": str(sample_id).strip() or "missing_id",
         "language": normalize_language_code(language),
-        "prediction": str(prediction or "").strip(),
+        "transcription": str(transcription or "").strip(),
     }
 
 
@@ -69,8 +69,8 @@ def validate_submission_rows(rows: list[dict[str, str]]) -> dict:
             violations.append(f"row {index}: id is required")
         if row.get("language") not in ALLOWED_LANGUAGE_CODES:
             violations.append(f"row {index}: language must be one of {ALLOWED_LANGUAGE_CODES}")
-        if row.get("prediction") is None:
-            violations.append(f"row {index}: prediction is required")
+        if row.get("transcription") is None:
+            violations.append(f"row {index}: transcription is required")
     return {
         "required_columns": SUBMISSION_COLUMNS,
         "allowed_language_codes": ALLOWED_LANGUAGE_CODES,

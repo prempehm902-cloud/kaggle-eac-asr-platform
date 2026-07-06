@@ -100,8 +100,8 @@ def _validate_submission_csv(path: Path | None) -> dict[str, Any]:
                     violations.append(f"Row {row_number}: invalid language code '{language}'.")
                 if not str(row.get("id", "")).strip():
                     violations.append(f"Row {row_number}: id is required.")
-                if row.get("prediction") is None:
-                    violations.append(f"Row {row_number}: prediction column is required.")
+                if row.get("transcription") is None:
+                    violations.append(f"Row {row_number}: transcription column is required.")
     except OSError as exc:
         violations.append(f"Could not read CSV: {exc}")
     return {
@@ -143,7 +143,7 @@ def collect_competition_validation() -> dict[str, Any]:
             "Kaggle CSV format",
             bool(submission["valid"]),
             f"Latest CSV: {submission['path'] or 'missing'}; rows: {submission['row_count']}; violations: {len(submission['violations'])}.",
-            "Generate a submission from Metadata > Kaggle submission builder. Header must be id,language,prediction.",
+            "Generate a submission from Metadata > Kaggle submission builder. Header must be id,language,transcription.",
         ),
         _check(
             "full_test_inference",
@@ -287,7 +287,7 @@ def write_competition_validation_reports() -> dict[str, Any]:
         "",
         "## Required Submission Format",
         "",
-        "CSV header must be exactly: `id,language,prediction`.",
+        "CSV header must be exactly: `id,language,transcription`.",
         "Language values must be ISO 639-3 codes: `swa`, `kik`, `luo`, `som`, `mas`, `kln`.",
         "",
         "## Competition Rules Summary",

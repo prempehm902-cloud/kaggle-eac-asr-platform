@@ -1,0 +1,29 @@
+{
+  "submission_csv": "outputs/local_data/submissions/final_competition_submission.csv",
+  "rows": 41733,
+  "shards_processed": 94,
+  "model_name": "tiny",
+  "runtime": "faster-whisper",
+  "device": "cpu",
+  "compute_type": "int8",
+  "language_counts": {
+    "kik": 7724,
+    "kln": 4837,
+    "luo": 7437,
+    "mas": 3789,
+    "som": 3925,
+    "swa": 12553
+  },
+  "latency_ms": {
+    "mean": 3740.9431284684442,
+    "min": 13.272833020891994,
+    "max": 40833.93533300841,
+    "files_measured": 40259
+  },
+  "submission_columns": [
+    "id",
+    "language",
+    "prediction"
+  ],
+  "manual_transcription_used": false
+}

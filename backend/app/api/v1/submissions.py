@@ -2,7 +2,7 @@ import csv
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
@@ -33,6 +33,7 @@ class KaggleSubmissionRequest(BaseModel):
 
 
 AUDIO_EXTENSIONS = {".wav", ".mp3", ".m4a", ".flac", ".ogg", ".webm"}
+EXPECTED_COMPETITION_ROWS = 41733
 
 
 def _candidate_audio_files(limit: int) -> list[Path]:
@@ -67,8 +68,90 @@ def kaggle_submission_requirements() -> dict:
     return {
         "required_columns": SUBMISSION_COLUMNS,
         "allowed_language_codes": ALLOWED_LANGUAGE_CODES,
+        "expected_rows": EXPECTED_COMPETITION_ROWS,
         "competition_rules": COMPETITION_RULES,
-        "example_row": {"id": "anv_test_0001", "language": "swa", "prediction": "habari yako leo"},
+        "example_row": {"id": "anv_test_0001.wav", "language": "swa", "transcription": "habari yako leo"},
+    }
+
+
+@router.post("/validate-upload")
+async def validate_kaggle_submission_upload(
+    file: UploadFile = File(...),
+    description: str = Form(""),
+) -> dict:
+    upload_dir = Path("outputs/local_data/submission_uploads")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    safe_name = Path(file.filename or f"submission-{uuid4().hex[:8]}.csv").name
+    upload_path = upload_dir / f"{uuid4().hex[:8]}-{safe_name}"
+    contents = await file.read()
+    upload_path.write_bytes(contents)
+
+    suffix = upload_path.suffix.lower()
+    base_result = {
+        "file_name": safe_name,
+        "stored_path": str(upload_path),
+        "description": description.strip(),
+        "required_columns": SUBMISSION_COLUMNS,
+        "expected_rows": EXPECTED_COMPETITION_ROWS,
+        "allowed_language_codes": ALLOWED_LANGUAGE_CODES,
+    }
+    if suffix != ".csv":
+        return {
+            **base_result,
+            "status": "stored",
+            "ready_for_kaggle": suffix in {".parquet", ".zip", ".gz", ".7z", ".tar"},
+            "warnings": ["Only CSV files can be fully validated in-browser; archive/parquet uploads were stored for manual inspection."],
+            "errors": [],
+        }
+
+    errors: list[str] = []
+    warnings: list[str] = []
+    row_count = 0
+    empty_cells = 0
+    invalid_language_rows: list[int] = []
+    duplicate_ids = 0
+    seen_ids: set[str] = set()
+
+    try:
+        text = contents.decode("utf-8-sig")
+        reader = csv.DictReader(text.splitlines())
+        if reader.fieldnames != SUBMISSION_COLUMNS:
+            errors.append(f"Header must be exactly {','.join(SUBMISSION_COLUMNS)}; found {reader.fieldnames}.")
+        for row_number, row in enumerate(reader, start=2):
+            row_count += 1
+            sample_id = str(row.get("id") or "").strip()
+            language = str(row.get("language") or "").strip()
+            transcript = str(row.get("transcription") or "").strip()
+            if not sample_id or not language or not transcript:
+                empty_cells += 1
+            if sample_id in seen_ids:
+                duplicate_ids += 1
+            seen_ids.add(sample_id)
+            if language not in ALLOWED_LANGUAGE_CODES and len(invalid_language_rows) < 10:
+                invalid_language_rows.append(row_number)
+    except UnicodeDecodeError:
+        errors.append("CSV must be UTF-8 encoded.")
+    except csv.Error as exc:
+        errors.append(f"CSV parsing failed: {exc}")
+
+    if row_count != EXPECTED_COMPETITION_ROWS:
+        errors.append(f"Expected {EXPECTED_COMPETITION_ROWS} data rows; found {row_count}.")
+    if empty_cells:
+        errors.append(f"Found {empty_cells} rows with empty id, language, or transcription values.")
+    if duplicate_ids:
+        errors.append(f"Found {duplicate_ids} duplicate id values.")
+    if invalid_language_rows:
+        errors.append(f"Language codes must be one of {ALLOWED_LANGUAGE_CODES}; first invalid rows: {invalid_language_rows}.")
+
+    return {
+        **base_result,
+        "status": "ready" if not errors else "needs_fix",
+        "ready_for_kaggle": not errors,
+        "row_count": row_count,
+        "empty_cells": empty_cells,
+        "duplicate_ids": duplicate_ids,
+        "warnings": warnings,
+        "errors": errors,
     }
 
 
