@@ -215,7 +215,23 @@
           <div class="hero-actions">
             <button class="primary" data-jump="transcribe">Record audio</button>
             <button id="submitPredictionButton" class="submit-prediction-button" type="button">Submit Prediction</button>
-            <button id="submitPredictionMoreButton" class="submission-more-button" type="button" aria-label="More submission options">•••</button>
+            <div class="submission-actions-menu-wrap">
+              <button id="submitPredictionMoreButton" class="submission-more-button" type="button" aria-label="More submission options" aria-expanded="false" aria-controls="submissionMoreMenu">•••</button>
+              <div id="submissionMoreMenu" class="submission-more-menu" role="menu" hidden>
+                <button type="button" role="menuitem" data-submission-action="collection">
+                  <span aria-hidden="true">▣</span>
+                  Add to Collection
+                </button>
+                <button type="button" role="menuitem" data-submission-action="bookmark">
+                  <span aria-hidden="true">▱</span>
+                  Bookmark
+                </button>
+                <button type="button" role="menuitem" data-submission-action="report">
+                  <span aria-hidden="true">△</span>
+                  Report Issue
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="model-tile" aria-label="Active model">

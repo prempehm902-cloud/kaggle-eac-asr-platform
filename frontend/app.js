@@ -12,6 +12,7 @@ const submissionBox = document.querySelector("#submissionBox");
 const submissionBuilderForm = document.querySelector("#submissionBuilderForm");
 const submitPredictionButton = document.querySelector("#submitPredictionButton");
 const submitPredictionMoreButton = document.querySelector("#submitPredictionMoreButton");
+const submissionMoreMenu = document.querySelector("#submissionMoreMenu");
 const submissionOverlay = document.querySelector("#submissionOverlay");
 const submissionCloseButton = document.querySelector("#submissionCloseButton");
 const submissionCancelButton = document.querySelector("#submissionCancelButton");
@@ -1664,12 +1665,55 @@ document.querySelectorAll("[data-jump]").forEach((button) => {
       createMenu.hidden = true;
       createMenuButton.setAttribute("aria-expanded", "false");
     }
+    closeSubmissionMoreMenu();
     if (submissionOverlay && !submissionOverlay.hidden) closeSubmissionDialog();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 });
 
 let selectedSubmissionFile = null;
+
+function closeSubmissionMoreMenu() {
+  if (!submissionMoreMenu || !submitPredictionMoreButton) return;
+  submissionMoreMenu.hidden = true;
+  submitPredictionMoreButton.setAttribute("aria-expanded", "false");
+}
+
+function toggleSubmissionMoreMenu(event) {
+  event?.stopPropagation();
+  if (!submissionMoreMenu || !submitPredictionMoreButton) return;
+  const willOpen = submissionMoreMenu.hidden;
+  submissionMoreMenu.hidden = !willOpen;
+  submitPredictionMoreButton.setAttribute("aria-expanded", String(willOpen));
+}
+
+function handleSubmissionMoreAction(action) {
+  closeSubmissionMoreMenu();
+  if (action === "collection") {
+    const savedCollections = JSON.parse(localStorage.getItem("kaggleAsrCollections") || "[]");
+    const item = {
+      title: "AfriVoices East Africa: ASR Hackathon",
+      type: "competition",
+      saved_at: new Date().toISOString(),
+    };
+    localStorage.setItem("kaggleAsrCollections", JSON.stringify([item, ...savedCollections].slice(0, 20)));
+    showToast("Competition added to your local collection.");
+    return;
+  }
+  if (action === "bookmark") {
+    const bookmarked = localStorage.getItem("kaggleAsrBookmarkedCompetition") === "true";
+    localStorage.setItem("kaggleAsrBookmarkedCompetition", String(!bookmarked));
+    showToast(bookmarked ? "Bookmark removed." : "Competition bookmarked.");
+    return;
+  }
+  if (action === "report") {
+    showPanel("contact");
+    history.pushState({ panel: "contact" }, "", "#contact");
+    const contactTopic = document.querySelector("[data-contact-topic='Submission support']");
+    contactTopic?.focus?.();
+    showToast("Opened support so you can report the issue.");
+  }
+}
 
 function switchSubmissionTab(tabName = "file") {
   submissionTabs.forEach((tab) => {
@@ -1712,6 +1756,13 @@ function setSubmissionFile(file) {
   if (submissionUploadResult) {
     submissionUploadResult.textContent = "File selected. Click Validate file to check the header, rows, language codes, duplicates, and empty values.";
   }
+}
+
+function syncSubmissionFileInput(file) {
+  if (!submissionFileInput || !file || typeof DataTransfer === "undefined") return;
+  const transfer = new DataTransfer();
+  transfer.items.add(file);
+  submissionFileInput.files = transfer.files;
 }
 
 function renderSubmissionUploadResult(result = {}) {
@@ -1762,8 +1813,21 @@ async function validateSubmissionUpload(event) {
   }
 }
 
-submitPredictionButton?.addEventListener("click", openSubmissionDialog);
-submitPredictionMoreButton?.addEventListener("click", openSubmissionDialog);
+submitPredictionButton?.addEventListener("click", () => {
+  closeSubmissionMoreMenu();
+  openSubmissionDialog();
+});
+submitPredictionMoreButton?.addEventListener("click", toggleSubmissionMoreMenu);
+submissionMoreMenu?.addEventListener("click", (event) => {
+  const actionButton = event.target.closest("[data-submission-action]");
+  if (!actionButton) return;
+  handleSubmissionMoreAction(actionButton.dataset.submissionAction);
+});
+document.addEventListener("click", (event) => {
+  if (!submissionMoreMenu || submissionMoreMenu.hidden) return;
+  if (event.target.closest(".submission-actions-menu-wrap")) return;
+  closeSubmissionMoreMenu();
+});
 submissionCloseButton?.addEventListener("click", closeSubmissionDialog);
 submissionCancelButton?.addEventListener("click", closeSubmissionDialog);
 submissionOverlay?.addEventListener("click", (event) => {
@@ -1771,6 +1835,7 @@ submissionOverlay?.addEventListener("click", (event) => {
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && submissionOverlay && !submissionOverlay.hidden) closeSubmissionDialog();
+  if (event.key === "Escape") closeSubmissionMoreMenu();
 });
 submissionTabs.forEach((tab) => {
   tab.addEventListener("click", () => switchSubmissionTab(tab.dataset.submissionTab));
@@ -1793,7 +1858,10 @@ submissionDropzone?.addEventListener("drop", (event) => {
   event.preventDefault();
   submissionDropzone.classList.remove("dragging");
   const file = event.dataTransfer?.files?.[0];
-  if (file) setSubmissionFile(file);
+  if (file) {
+    syncSubmissionFileInput(file);
+    setSubmissionFile(file);
+  }
 });
 submissionDescription?.addEventListener("input", () => {
   if (submissionDescriptionCount) submissionDescriptionCount.textContent = String(submissionDescription.value.length);

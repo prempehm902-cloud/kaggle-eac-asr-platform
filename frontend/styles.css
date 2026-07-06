@@ -223,6 +223,63 @@ textarea {
   background: rgba(17, 24, 39, 0.08);
 }
 
+.submission-actions-menu-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.submission-more-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  min-width: 250px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+}
+
+.submission-more-menu[hidden] {
+  display: none;
+}
+
+.submission-more-menu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  color: #20242c;
+  padding: 18px 20px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.submission-more-menu button:last-child {
+  border-bottom: 0;
+}
+
+.submission-more-menu button:hover,
+.submission-more-menu button:focus-visible {
+  background: #f8fafc;
+  outline: none;
+}
+
+.submission-more-menu span {
+  width: 28px;
+  color: #20242c;
+  font-size: 1.3rem;
+  line-height: 1;
+  text-align: center;
+}
+
 .dataset-actions {
   display: flex;
   justify-content: flex-end;
@@ -3820,6 +3877,8 @@ body.dark-theme .user-dropdown span {
 body.dark-theme .submission-dialog,
 body.dark-theme .submission-close,
 body.dark-theme .submission-dropzone,
+body.dark-theme .submission-more-menu,
+body.dark-theme .submission-more-menu button,
 body.dark-theme .secondary-action,
 body.dark-theme .selected-submission-file,
 body.dark-theme .submission-description-label textarea,
@@ -3842,8 +3901,14 @@ body.dark-theme .submission-method-card p {
 }
 
 body.dark-theme .submission-tab.active,
+body.dark-theme .submission-more-menu span,
 body.dark-theme .submission-cli-box code {
   color: #111827 !important;
+}
+
+body.dark-theme .submission-more-menu button:hover,
+body.dark-theme .submission-more-menu button:focus-visible {
+  background: #f8fafc !important;
 }
 
 @media (max-width: 760px) {
