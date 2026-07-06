@@ -1813,65 +1813,68 @@ async function validateSubmissionUpload(event) {
   }
 }
 
-submitPredictionButton?.addEventListener("click", () => {
-  closeSubmissionMoreMenu();
-  openSubmissionDialog();
-});
-submitPredictionMoreButton?.addEventListener("click", toggleSubmissionMoreMenu);
-submissionMoreMenu?.addEventListener("click", (event) => {
-  const actionButton = event.target.closest("[data-submission-action]");
-  if (!actionButton) return;
-  handleSubmissionMoreAction(actionButton.dataset.submissionAction);
-});
-document.addEventListener("click", (event) => {
-  if (!submissionMoreMenu || submissionMoreMenu.hidden) return;
-  if (event.target.closest(".submission-actions-menu-wrap")) return;
-  closeSubmissionMoreMenu();
-});
-submissionCloseButton?.addEventListener("click", closeSubmissionDialog);
-submissionCancelButton?.addEventListener("click", closeSubmissionDialog);
-submissionOverlay?.addEventListener("click", (event) => {
-  if (event.target === submissionOverlay) closeSubmissionDialog();
-});
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && submissionOverlay && !submissionOverlay.hidden) closeSubmissionDialog();
-  if (event.key === "Escape") closeSubmissionMoreMenu();
-});
-submissionTabs.forEach((tab) => {
-  tab.addEventListener("click", () => switchSubmissionTab(tab.dataset.submissionTab));
-});
-submissionBrowseButton?.addEventListener("click", () => submissionFileInput?.click());
-submissionDropzone?.addEventListener("click", () => submissionFileInput?.click());
-submissionDropzone?.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" || event.key === " ") {
+if (!document.body.dataset.submissionControlsWired) {
+  document.body.dataset.submissionControlsWired = "app";
+  submitPredictionButton?.addEventListener("click", () => {
+    closeSubmissionMoreMenu();
+    openSubmissionDialog();
+  });
+  submitPredictionMoreButton?.addEventListener("click", toggleSubmissionMoreMenu);
+  submissionMoreMenu?.addEventListener("click", (event) => {
+    const actionButton = event.target.closest("[data-submission-action]");
+    if (!actionButton) return;
+    handleSubmissionMoreAction(actionButton.dataset.submissionAction);
+  });
+  document.addEventListener("click", (event) => {
+    if (!submissionMoreMenu || submissionMoreMenu.hidden) return;
+    if (event.target.closest(".submission-actions-menu-wrap")) return;
+    closeSubmissionMoreMenu();
+  });
+  submissionCloseButton?.addEventListener("click", closeSubmissionDialog);
+  submissionCancelButton?.addEventListener("click", closeSubmissionDialog);
+  submissionOverlay?.addEventListener("click", (event) => {
+    if (event.target === submissionOverlay) closeSubmissionDialog();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && submissionOverlay && !submissionOverlay.hidden) closeSubmissionDialog();
+    if (event.key === "Escape") closeSubmissionMoreMenu();
+  });
+  submissionTabs.forEach((tab) => {
+    tab.addEventListener("click", () => switchSubmissionTab(tab.dataset.submissionTab));
+  });
+  submissionBrowseButton?.addEventListener("click", () => submissionFileInput?.click());
+  submissionDropzone?.addEventListener("click", () => submissionFileInput?.click());
+  submissionDropzone?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      submissionFileInput?.click();
+    }
+  });
+  submissionFileInput?.addEventListener("change", () => setSubmissionFile(submissionFileInput.files?.[0]));
+  submissionDropzone?.addEventListener("dragover", (event) => {
     event.preventDefault();
-    submissionFileInput?.click();
-  }
-});
-submissionFileInput?.addEventListener("change", () => setSubmissionFile(submissionFileInput.files?.[0]));
-submissionDropzone?.addEventListener("dragover", (event) => {
-  event.preventDefault();
-  submissionDropzone.classList.add("dragging");
-});
-submissionDropzone?.addEventListener("dragleave", () => submissionDropzone.classList.remove("dragging"));
-submissionDropzone?.addEventListener("drop", (event) => {
-  event.preventDefault();
-  submissionDropzone.classList.remove("dragging");
-  const file = event.dataTransfer?.files?.[0];
-  if (file) {
-    syncSubmissionFileInput(file);
-    setSubmissionFile(file);
-  }
-});
-submissionDescription?.addEventListener("input", () => {
-  if (submissionDescriptionCount) submissionDescriptionCount.textContent = String(submissionDescription.value.length);
-});
-copySubmissionCliButton?.addEventListener("click", async () => {
-  const command = 'kaggle competitions submit -c afri-voices-east-africa-asr-hackathon -f final_competition_submission_transcription.csv -m "Automated ASR submission"';
-  await navigator.clipboard?.writeText(command);
-  showToast("Kaggle CLI command copied.");
-});
-submissionUploadForm?.addEventListener("submit", validateSubmissionUpload);
+    submissionDropzone.classList.add("dragging");
+  });
+  submissionDropzone?.addEventListener("dragleave", () => submissionDropzone.classList.remove("dragging"));
+  submissionDropzone?.addEventListener("drop", (event) => {
+    event.preventDefault();
+    submissionDropzone.classList.remove("dragging");
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      syncSubmissionFileInput(file);
+      setSubmissionFile(file);
+    }
+  });
+  submissionDescription?.addEventListener("input", () => {
+    if (submissionDescriptionCount) submissionDescriptionCount.textContent = String(submissionDescription.value.length);
+  });
+  copySubmissionCliButton?.addEventListener("click", async () => {
+    const command = 'kaggle competitions submit -c afri-voices-east-africa-asr-hackathon -f final_competition_submission_transcription.csv -m "Automated ASR submission"';
+    await navigator.clipboard?.writeText(command);
+    showToast("Kaggle CLI command copied.");
+  });
+  submissionUploadForm?.addEventListener("submit", validateSubmissionUpload);
+}
 
 async function inspectLocalDataset() {
   if (!localDatasetBox) return;

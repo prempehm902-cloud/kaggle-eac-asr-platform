@@ -179,6 +179,8 @@ textarea {
 }
 
 .hero-actions {
+  position: relative;
+  z-index: 25;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -186,6 +188,8 @@ textarea {
 }
 
 .submit-prediction-button {
+  position: relative;
+  z-index: 2;
   min-height: 52px;
   border: 0;
   border-radius: 999px;
@@ -207,6 +211,8 @@ textarea {
 }
 
 .submission-more-button {
+  position: relative;
+  z-index: 2;
   min-width: 48px;
   min-height: 48px;
   border: 0;
@@ -225,6 +231,7 @@ textarea {
 
 .submission-actions-menu-wrap {
   position: relative;
+  z-index: 45;
   display: inline-flex;
 }
 
@@ -232,7 +239,7 @@ textarea {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  z-index: 40;
+  z-index: 120;
   min-width: 250px;
   overflow: hidden;
   border: 1px solid var(--line);
@@ -3187,6 +3194,7 @@ body:has(#navToggle:checked) .create-menu {
 
 .submission-overlay[hidden] {
   display: none !important;
+  pointer-events: none;
 }
 
 .submission-dialog {
