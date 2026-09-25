@@ -1,4 +1,6 @@
 .DS_Store
+.idea/
+.vscode/
 __pycache__/
 *.py[cod]
 *.pyo
@@ -26,4 +28,3 @@ reports/generated/
 node_modules/
 dist/
 build/
-

@@ -1,5 +1,9 @@
 # Kaggle EAC ASR Platform
 
+[![CI](https://github.com/prempehm902-cloud/kaggle-eac-asr-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/prempehm902-cloud/kaggle-eac-asr-platform/actions/workflows/ci.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
+
 **Live Demo:** https://kaggle-eac-asr-platform.onrender.com  
 **API Docs:** https://kaggle-eac-asr-platform.onrender.com/docs  
 **Health Check:** https://kaggle-eac-asr-platform.onrender.com/api/v1/health  
@@ -7,6 +11,8 @@
 Kaggle EAC ASR Platform is a full-stack Automatic Speech Recognition system built for the AfriVoice East Africa ASR Hackathon. The platform helps users record, upload, transcribe, review, correct, replay, export, evaluate, and manage speech data for six East African languages.
 
 The project is designed as a practical ASR engineering platform, not only a transcription demo. It includes a FastAPI backend, a modern browser dashboard, audio recording and upload workflows, transcript history, reviewer tools, model comparison, WER/CER/accuracy evaluation, dataset audit tools, Kaggle submission support, and edge/offline deployment planning.
+
+![AfriVoice ASR dashboard](outputs/professional-dashboard-sidebar.png)
 
 ## Supported Languages
 
@@ -195,20 +201,25 @@ To enable real ASR inference in production, install the required ML dependencies
 ## Project Structure
 
 ```text
-backend/app/          FastAPI backend, services, model adapters, and database models
-backend/alembic/      Database migrations
-backend/tests/        Backend API and workflow tests
-frontend/             Browser dashboard served by FastAPI
-docs/                 Architecture, API map, local setup, and operations notes
-infrastructure/       Docker and local infrastructure files
-scripts/              Bootstrap, run, test, smoke-check, and cleanup scripts
-backend/ml/           Dataset preparation, evaluation, and submission helpers
-backend/edge/         Edge/offline CLI entry points
-data/manifests/       Clean dataset manifests
-models/exports/       Generated model export packages
-reports/              Evaluation and deployment reports
-outputs/local_data/   Local runtime data, uploads, database, and submissions
+kaggle-eac-asr-platform/
+├── .github/workflows/       Continuous integration
+├── backend/
+│   ├── app/                 FastAPI application, services, and persistence
+│   ├── alembic/             Database migrations
+│   ├── edge/                Offline and edge CLI tools
+│   ├── ml/                  Data, evaluation, and model export pipelines
+│   └── tests/               API and workflow tests
+├── data/manifests/          Versioned dataset metadata (no raw audio)
+├── docs/                    Architecture, operations, and compliance guides
+├── frontend/                Browser dashboard served by FastAPI
+├── infra/                   Local container infrastructure
+├── models/                  Model cards, metadata, and ignored artifacts
+├── outputs/local_data/      Ignored runtime data, uploads, and submissions
+├── reports/                 Versioned evaluation and validation evidence
+└── scripts/                 Setup, run, test, and maintenance commands
 ```
+
+See [Architecture](docs/ARCHITECTURE.md), [Local setup](docs/LOCAL_SETUP.md), and [Contributing](CONTRIBUTING.md) for deeper technical guidance.
 
 ## Current Status
 

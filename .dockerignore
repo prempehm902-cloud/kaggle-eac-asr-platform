@@ -1,0 +1,16 @@
+.git
+.github
+.idea
+.pytest_cache
+.ruff_cache
+.venv
+__pycache__
+*.py[cod]
+*.db
+.env
+data/raw
+docs/assets/screenshots
+models/checkpoints
+models/exports
+outputs/local_data
+reports/generated
